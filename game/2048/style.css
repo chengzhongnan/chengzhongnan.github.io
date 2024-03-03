@@ -1,0 +1,24 @@
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 100px); /* 4x4 grid */
+    grid-gap: 10px;
+    padding: 10px;
+    background-color: #cdc1b5;
+  }
+  
+  .grid-cell {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    line-height: 100px; /* Vertically centers text */
+    font-size: 25px; 
+    font-weight: bold;
+    border-radius: 5px;
+    background-color: #eee4da;
+  }
