@@ -1,5 +1,5 @@
 let grid = [];
-const GRID_SIZE = 4;
+const GRID_SIZE = 5;
 
 function initGrid() {
   grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(0));
