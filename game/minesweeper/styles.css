@@ -1,0 +1,43 @@
+#board {
+    display: grid;
+}
+
+#container {
+    display: grid;
+    justify-content: center; /* Center content horizontally */
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.flagged::after {
+    content: '🚩';
+}
+
+.boomed::after {
+    content: '💣';
+}
+
+.open {
+    background-color: #fff; /* Change to desired color */
+    border: 3px solid #ccc; /* Change to desired border style */
+    /* Add any other styles for open cells */
+}
+
+.unopened {
+    background-color: #999; /* Change to desired color */
+    border: 3px solid #666; /* Change to desired border style */
+    /* Add any other styles for unopened cells */
+}
