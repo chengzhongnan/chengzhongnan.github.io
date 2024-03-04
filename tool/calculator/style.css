@@ -35,16 +35,7 @@ body {
     cursor: pointer;
     line-height: 60px; /* Adjust this as needed */
   }
-
-  /* Special Styles */
-  .number.AC { 
-    grid-column: span 2; /* "AC" button spans 2 columns */
-  }
   
-  .number.zero { 
-    grid-column: span 2; /* "0" button spans 2 columns */
-  } 
-
   .equal {
     grid-column: 4 / 5;   /* Spans from column 4 to 5 */
     grid-row: 3 / 7;      /* Spans from row 2 to 6 */
