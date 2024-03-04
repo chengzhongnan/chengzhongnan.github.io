@@ -23,10 +23,11 @@ body {
   
   .display {
     grid-column: span 4; /* Display spans all 4 columns */
-    background-color: #ddd;
+    background-color: #000;
+    color: #FFFFFF;
     text-align: right; 
     padding: 10px; 
-    font-size: 20px;
+    font-size: 35px;
   }
   
   .button {
