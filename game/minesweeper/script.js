@@ -3,9 +3,9 @@ const container = document.getElementById('container');
 
 let minesweeperBoard = [];
 
-let rowCount = 12;
-let colCount = 12;
-let landmineCount = 10;
+let rowCount = 15;
+let colCount = 15;
+let landmineCount = 40;
 let isGameOver = false;
 
 function setContainerAttribute() {
