@@ -1,10 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>程中南的主页</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的工具主页</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .tool-card {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .tool-card h2 {
+            margin-top: 0;
+        }
+        .tool-card p {
+            margin-bottom: 10px;
+        }
+        .tool-card a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .tool-card a:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-  <div id="main"></div>
+    <div class="container">
+        <h1>欢迎来到我的工具主页</h1>
+        <div class="tool-card">
+            <h2>工具名称1</h2>
+            <p>这是工具1的简要描述。可以写一些关于工具1的介绍。</p>
+            <a href="#">了解更多</a>
+        </div>
+        <div class="tool-card">
+            <h2>工具名称2</h2>
+            <p>这是工具2的简要描述。可以写一些关于工具2的介绍。</p>
+            <a href="#">了解更多</a>
+        </div>
+        <!-- 可以根据需要添加更多工具卡片 -->
+    </div>
 </body>
 </html>
