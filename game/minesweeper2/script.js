@@ -596,7 +596,11 @@ function onChangeSwitchState() {
 }
 
 function onGridCellClick(cell) {
-    console.log(cell);
+    
+    if (cell.isOpen) {
+        return;
+    }
+
     if (clickState == cell.state) {
         cell.isOpen = true;
     } else {
@@ -726,6 +730,21 @@ function initConfig() {
     canvas.setAttribute('height', height + 'px');
 }
 
+let isSetAutoPlayEvent = false;
+function autoPlaySound() {
+    if (isSetAutoPlayEvent) {
+        return;
+    }
+    isSetAutoPlayEvent = true;
+    document.addEventListener('click', () => {
+        document.querySelector("audio").play();
+    });
+    // 监听鼠标移动的事件
+    document.addEventListener('mousemove', () => {
+        document.querySelector("audio").play();
+    });
+}
+
 async function main() {
 
     initConfig();
@@ -734,6 +753,7 @@ async function main() {
     // Initialize grid
     initGrid();
     initVue();
+    autoPlaySound();
     
     canvas.addEventListener('click', onCanvasClick);
 }
