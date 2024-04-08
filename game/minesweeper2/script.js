@@ -1,10 +1,14 @@
-const ROWS = 10;
-const COLS = 10;
-
 // 点击的时候判断状态，如果格子状态与点击状态相同就正确，否则错误
 let clickState = 1;
+// 错误数量
 let errorCount = 0;
+// 等级: 1初级，2中级，3高级
+let level = 1;
+// 自动空白填充
+let autoOpenBlank = true;
 
+let ROWS = 10;
+let COLS = 10;
 // 左边和上面的数字显示框
 const ROW_START_INDEX = 110;
 const COL_START_INDEX = 110;
@@ -14,7 +18,7 @@ const COL_STEP = 20;
 // 点击区域
 const CELL_SIZE = 30;
 const CELL_BORDER_SIZE = 1;
-const GRID_SIZE = ROWS * CELL_SIZE;
+let GRID_SIZE = ROWS * CELL_SIZE;
 const CORNER_RADIUS = 5;
 
 // 配色
@@ -69,8 +73,95 @@ function initGrid() {
             gridState[i][j] = Math.round(Math.random());
         }
     }
+
+    checkGrid();
+
     drawGrid();
     drawCountBox();
+}
+
+function checkGrid() {
+    let changed = false;
+    for (let i = 0; i < ROWS; i++) {
+        let ret = checkGridRow(i);
+        changed = changed || ret;
+    }
+
+    for (let i = 0 ; i < COLS; i++) {
+        let ret = checkGridCol(i);
+        changed = changed || ret;
+    }
+
+    if (changed) {
+        checkGrid();
+    }
+}
+
+function countConsecutiveOnesSimple(arr) {
+    let counts = [];
+    let count = 0;
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] === 1) {
+            count++;
+        } else if (count > 0) {
+            counts.push(count);
+            count = 0;
+        }
+    }
+    if (count > 0) {
+        counts.push(count);
+    }
+    return counts;
+}
+
+function getRowZeroIndex(rows) {
+    let results = [];
+    for (let i = 0 ; i < rows.length; i++) {
+        if (rows[i] == 0) {
+            results.push(i);
+        }
+    }
+
+    return results;
+}
+
+// check one row has only 5 numbers
+function checkGridRow(row) {
+    let ret = false;
+    while(true) {
+        let rowDatas = gridState[row];
+        let rowOnes = countConsecutiveOnesSimple(rowDatas);
+        if (rowOnes.length <= 5) {
+            break;
+        }
+        let zeroIndexs = getRowZeroIndex(rowDatas);
+        let randomIndex = Math.floor(Math.random() * zeroIndexs.length);
+        gridState[row][zeroIndexs[randomIndex]] = 1;
+        ret = true;
+    }
+
+    return ret;
+}
+
+// check one col has only 5 numbers
+function checkGridCol(col) {
+    let ret = false;
+    while(true) {
+        let rowDatas = [];
+        for (let i = 0 ; i < ROWS; i++) {
+            rowDatas[i] = gridState[i][col];
+        }
+        let rowOnes = countConsecutiveOnesSimple(rowDatas);
+        if (rowOnes.length <= 5) {
+            break;
+        }
+        let zeroIndexs = getRowZeroIndex(rowDatas);
+        let randomIndex = Math.floor(Math.random() * zeroIndexs.length);
+        gridState[zeroIndexs[randomIndex]][col] = 1;
+        ret = true;
+    }
+
+    return ret;
 }
 
 // Draw rounded rectangle
@@ -211,8 +302,12 @@ function countConsecutiveOnes(arr) {
     let counts = [];
     let count = 0;
     let full = true;
+    let from = 0;
     for (let i = 0; i < arr.length; i++) {
         if (arr[i].state === 1) {
+            if (count == 0) {
+                from = i;
+            }
             count++;
             full = (full && arr[i].isOpen);
             if (full) {
@@ -221,7 +316,9 @@ function countConsecutiveOnes(arr) {
         } else if (count > 0) {
             counts.push({
                 count: count,
-                full: full
+                full: full,
+                from: from,
+                to: i
             });
             count = 0;
             full = true;
@@ -230,13 +327,15 @@ function countConsecutiveOnes(arr) {
     if (count > 0) {
         counts.push({
             count: count,
-            full: full
+            full: full,
+            from: from,
+            to: arr.length
         });
     }
     return counts;
 }
 
-function getRowTextArray(row) {
+function getRowData(row) {
     let rowData = [];
     for (let i = 0 ; i < COLS; i++) {
         rowData.push({
@@ -246,10 +345,10 @@ function getRowTextArray(row) {
             isOpen: gridData[row][i].isOpen
         })
     }
-    return countConsecutiveOnes(rowData); 
+    return rowData;
 }
 
-function getColTextArray(col) {
+function getColData(col) {
     let colData = [];
     for (let i = 0; i < ROWS; i++) {
         colData.push({
@@ -260,7 +359,7 @@ function getColTextArray(col) {
         });
     }
 
-    return countConsecutiveOnes(colData);
+    return colData;
 }
 
 function drawCountBox() {
@@ -270,14 +369,143 @@ function drawCountBox() {
         drawRoundedRect(COL_START_INDEX + col * CELL_SIZE, 0,
             CELL_SIZE - CELL_BORDER_SIZE, ROW_START_INDEX - CELL_BORDER_SIZE, CORNER_RADIUS, color.label);
         
-            drawTextArray(getColTextArray(col), ROW_START_INDEX + col * CELL_SIZE + CELL_BORDER_SIZE * 3, 0, 'h')        
+        let colData = getColData(col);
+        let colArray = countConsecutiveOnes(colData);
+        drawTextArray(colArray, ROW_START_INDEX + col * CELL_SIZE + CELL_BORDER_SIZE * 3, 0, 'h');
+        checkFullColGrid(col, colArray); 
     }
 
     for (let row = 0; row < ROWS; row++) {
         drawRoundedRect(0, ROW_START_INDEX + row * CELL_SIZE,
             COL_START_INDEX - CELL_BORDER_SIZE, CELL_SIZE - CELL_BORDER_SIZE, CORNER_RADIUS, color.label);
 
-        drawTextArray(getRowTextArray(row), 0, COL_START_INDEX + row * CELL_SIZE + CELL_SIZE / 2, 'v')
+        let rowData = getRowData(row);
+        let rowArray = countConsecutiveOnes(rowData); 
+        drawTextArray(rowArray, 0, COL_START_INDEX + row * CELL_SIZE + CELL_SIZE / 2, 'v');
+        checkFullRowGrid(row, rowArray);
+    }
+}
+
+function openCol(col, start, end) {
+    for (let i = start ; i < end; i++) {
+        gridData[i][col].isOpen = true;
+    }
+}
+
+function openRow(row, start, end) {
+    for (let i = start; i < end; i++) {
+        gridData[row][i].isOpen = true;
+    }
+}
+
+/**
+ * 
+ * @param {number} col 
+ * @param {{count: number, full: boolean, from: number, to: number}[]} colArray 
+ * @returns 
+ */
+function checkFullColGrid(col, colArray) {
+    if (!autoOpenBlank || colArray.length <= 0) {
+        return;
+    }
+    
+    // 第一个
+    if (colArray[0].full) {
+        openCol(col, 0, colArray[0].from);
+        if (colArray.length == 1) {
+            openCol(col, colArray[0].to, ROWS);
+        } else {
+            if (colArray[1].full) {
+                openCol(col, colArray[0].to, colArray[1].from);
+            } else {
+                openCol(col, colArray[0].to, colArray[0].to + 1);
+            }
+        } 
+    }
+
+    let last = colArray.length - 1;
+    // 最后一个
+    if (last != 0 && colArray[last].full) {
+        if (colArray[last - 1].full) {
+            openCol(col, colArray[last - 1].to, colArray[last].from);
+        } else {
+            openCol(col, colArray[last].from - 1, colArray[last].from);
+        }
+
+        openCol(col, colArray[last].to, ROWS);
+    }
+
+    // 其他
+    for (let i = 1; i < last; i++) {
+        if (colArray[i].full) {
+            if (colArray[i - 1].full) {
+                openCol(col, colArray[i - 1].to, colArray[i].from);
+            } else {
+                openCol(col, colArray[i].from - 1, colArray[i].from);
+            }
+            
+            if (colArray[i + 1].full) {
+                openCol(col, colArray[i].to, colArray[i + 1].from);
+            } else {
+                openCol(col, colArray[i].to, colArray[i].to + 1);
+            }
+        }
+    }
+}
+
+/**
+ * 
+ * @param {number} col 
+ * @param {{count: number, full: boolean, from: number, to: number}[]} rowArray 
+ * @returns 
+ */
+function checkFullRowGrid(row, rowArray) {
+    if (!autoOpenBlank || rowArray.length <= 0) {
+        return;
+    }
+    
+    // 第一个
+    if (rowArray[0].full) {
+        openRow(row, 0, rowArray[0].from);
+        if (rowArray.length == 1) {
+            openRow(row, rowArray[0].to, COLS);
+        } else {
+            if (rowArray[1].full) {
+                openRow(row, rowArray[0].to, rowArray[1].from);
+            } else {
+                openRow(row, rowArray[0].to, rowArray[0].to + 1);
+            }
+        } 
+    }
+
+    let last = rowArray.length - 1;
+    // 最后一个
+    if (last != 0 && rowArray[last].full) {
+        if (rowArray[last - 1].full) {
+            openRow(row, rowArray[last - 1].to, rowArray[last].from);
+        } else {
+            openRow(row, rowArray[last].from - 1, rowArray[last].from);
+        }
+        
+        openRow(row, rowArray[last].to, COLS);
+    }
+
+    // 其他
+    for (let i = 1; i < last; i++) {
+        if (rowArray[i].full) {
+            if (rowArray[i - 1].full) {
+                openRow(row, rowArray[i - 1].to, rowArray[i].from);
+            } else {
+                openRow(row, rowArray[i].from - 1, rowArray[i].from);
+            }
+            
+            if (rowArray[i + 1].full) {
+                openRow(row, rowArray[i].to, rowArray[i + 1].from);
+            } else {
+                openRow(row, rowArray[i].to, rowArray[i].to + 1);
+            }
+            
+        }
     }
 }
 
@@ -315,7 +543,7 @@ function drawGridCell(i, j) {
 
 // Draw grid and update counts
 function drawGrid() {
-    ctx.clearRect(0, 0, GRID_SIZE + ROW_START_INDEX, GRID_SIZE + COL_START_INDEX);
+    ctx.clearRect(ROW_START_INDEX, COL_START_INDEX, GRID_SIZE + ROW_START_INDEX, GRID_SIZE + COL_START_INDEX);
 
     const rowCounts = Array.from({
         length: ROWS
@@ -376,9 +604,9 @@ function onGridCellClick(cell) {
         cell.isOpen = true;
         errorCount += 1;
     }
-
-    drawGrid();
+    // 这里先画上面和左边的数字，是为了在里面同时智能开启空格
     drawCountBox();
+    drawGrid();
 }
 
 // Canvas点击事件
@@ -415,25 +643,97 @@ function checkGameOver() {
 
     if (isOver) {
         if (errorCount == 0) {
-            alert ('恭喜你，完美通关');
+            setTimeout(() => {
+                alert ('恭喜你，完美过关');
+                main();
+            }, 500);
+            
         } else {
-            alert (`游戏结束，本局中你一共失误${errorCount}次`);
+            setTimeout(() => {
+                alert (`游戏结束，本局中你一共失误${errorCount}次`);
+                main();
+            }, 500)
         }
-
-        main();
     }
 }
 
-async function main() {
+let isVueInit = false;
+
+function initVue() {
+    if (isVueInit) {
+        return;
+    }
+
+    isVueInit = true;
+
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                radio1: '初级',
+                checked: true
+            };
+        },
+        methods: {
+            onLevelChanged(value) {
+                if (value == '初级') {
+                    level = 1;
+                    main();
+                } else if (value == '中级') {
+                    level = 2;
+                    main();
+                } else if (value == '高级') {
+                    level = 3;
+                    main();
+                } else {
+                    console.log(value)
+                }
+            },
+            OnAutoOpenChanged(value) {
+                // console.log(value);
+                autoOpenBlank = value;
+            }
+        }
+    });
+}
+
+function initConfig() {
     clickState = 1;
     errorCount = 0;
     
     gridState = [];
     gridData = [];
 
+    if (level == 1) {
+        ROWS = 10;
+        COLS = 10;
+        GRID_SIZE = ROWS * CELL_SIZE;
+    } else if (level == 2) {
+        ROWS = 15;
+        COLS = 15;
+        GRID_SIZE = ROWS * CELL_SIZE;
+    } else if (level == 3) {
+        ROWS = 20;
+        COLS = 20;
+        GRID_SIZE = ROWS * CELL_SIZE;
+    }
+
+    let canvas = document.getElementById('gridCanvas');
+    let width = COL_START_INDEX + CELL_SIZE * COLS;
+    let height = ROW_START_INDEX + CELL_SIZE * ROWS;
+
+    canvas.setAttribute('width', width + 'px');
+    canvas.setAttribute('height', height + 'px');
+}
+
+async function main() {
+
+    initConfig();
+
     await loadResource();
     // Initialize grid
     initGrid();
+    initVue();
     
     canvas.addEventListener('click', onCanvasClick);
 }
