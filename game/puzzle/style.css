@@ -1,0 +1,69 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column; /* 垂直布局 */
+    align-items: center; /* 水平居中 */
+    margin-top:     10px;
+  }
+  
+  canvas {
+    border: 1px solid black;
+    margin: 10px;
+  }
+#canvas-container {
+    position: relative;
+    width: 600px; /* 修改为你的画布宽度 */
+    height: 600px; /* 修改为你的画布高度 */
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  #puzzle-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 150px; /* 面板高度 */
+    overflow-x: scroll;
+    white-space: nowrap;
+    background-color: #ccc;
+  }
+
+  .hexagon {
+    width: 50px; /* 六边形宽度 */
+    height: 50px; /* 六边形高度 */
+    background-color: #f0f0f0;
+    display: inline-block;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    margin: 5px; /* 六边形之间的间距 */
+    cursor: pointer;
+  }
+
+  .image-container {
+    width: 800px; /* Width of the visible area */
+    overflow-x: auto; /* Enable horizontal scroll */
+    overflow-y: hidden; /* Hide vertical scroll if needed */
+    border: 1px solid #ccc; /* Add a border */
+  }
+  
+  .image-slider {
+    display: flex;     /* Arrange images horizontally */
+    width: 1000px;     /* Total width of images, adjust as needed */
+  }
+  
+  .image-slider img {
+    width: 150px;     /* Width of individual images */  
+    height: auto;  
+    margin-right: 10px; /* Spacing between images */
+  }
+  
+  .split-canvas {
+    border: none;
+  }
