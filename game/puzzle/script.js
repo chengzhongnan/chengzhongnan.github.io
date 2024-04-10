@@ -64,7 +64,8 @@ function InitImage(ctx, width, height) {
     img.onload = function () {
         // 挂载图片到ctx上去
         ctx.RawImage = img;
-        ctx.drawImage(img, 0, 0, width, height);
+        // 采用居中绘制
+        drawImage(ctx, width, height);
         drawPuzzle(ctx, false);
         initChipState();
         copySplitPolygon();
@@ -79,12 +80,41 @@ function initChipState() {
     }
 }
 
+// sw / sh = w / h
+
+function drawImage(ctx, width, height) {
+    let min = Math.min(ctx.RawImage.width, ctx.RawImage.height);
+    let sx = 0, sy = 0, swidth = 0, sheight = 0;
+    if (min >= width && min >= height) {
+        if (ctx.RawImage.width > min) {        
+            sy = 0,
+            sheight = ctx.RawImage.height;
+    
+            // 宽度裁剪，按照宽度中心点对齐
+            swidth = min * width / height;
+            sx = (ctx.RawImage.width - swidth) / 2; 
+    
+        } else {
+            sx = 0,
+            swidth = ctx.RawImage.width;
+            
+            // 高度裁剪，按照高度中心点对齐
+            sheight = min * height / width;
+            sy = (ctx.RawImage.height - sheight) / 2;
+        }
+        ctx.drawImage(ctx.RawImage, sx, sy, swidth, sheight, 0, 0, width, height);
+    } else {
+        ctx.drawImage(ctx.RawImage, 0, 0, width, height);
+    }
+    
+}
+
 function redrawCanvas(ctx, width, height) {
     if (ctx.RawImage == null) {
         return;
     }
 
-    ctx.drawImage(ctx.RawImage, 0, 0, width, height);
+    drawImage(ctx, width, height);
     drawPuzzle(ctx, true);
 }
 
