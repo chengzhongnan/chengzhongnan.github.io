@@ -58,7 +58,7 @@ const hexCoordinates = [
     [11, 10],
 ];
 
-const chipState = [];
+let chipState = [];
 
 // 绘制六边形
 function drawHexagon(ctx, centerX, centerY, index, isFill) {
@@ -110,6 +110,7 @@ function InitImage(ctx, width, height) {
 }
 
 function initChipState() {
+    chipState = [];
     for (let i = 0; i < hexCoordinates.length; i++) {
         chipState[i] = 0;
     }
@@ -193,10 +194,10 @@ function convertCoordToPoint(coord) {
     }
 }
 
-function clearPuzzles(index) {
-    let dom = document.getElementById('split-canvas-id');
-    for (let ele of dom.getElementsByTagName('canvas')) {
-        dom.removeChild(ele);
+function clearPuzzles() {
+    let element = document.getElementById('split-canvas-id');
+    while (element.firstChild) {
+        element.removeChild(element.firstChild); // 循环删除第一个子节点，直到没有子节点为止
     }
 }
 
