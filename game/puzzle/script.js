@@ -335,6 +335,9 @@ function showRawPicture() {
 }
 
 function resetPicture() {
+    if (canvasCtx.RawImage != null) {
+        canvasCtx.RawImage = null;
+    }
     InitImage(canvasCtx, rawImageWidth, rawImageHeight);
 }
 
