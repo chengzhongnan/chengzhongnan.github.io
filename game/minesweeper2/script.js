@@ -30,6 +30,7 @@ const CORNER_RADIUS = 5;
 // 配色
 const color = {
     grid: '#F0EDDA',
+    bigGrid: '#FF7F7F',
     label: '#C8AD5E',
     textRaw: '#FFFF5E',
     textFull: '#00FF00',
@@ -116,9 +117,36 @@ function initGrid() {
     gridState = initData.gridState;
 
     checkGrid();
+    chechGridData();
 
     drawGrid();
     drawCountBox();
+}
+
+function chechGridData() {
+
+    for (let i = 0 ; i < ROWS; i++) {
+        for (let j = 0 ; j < COLS; j++) {
+            const x = j * CELL_SIZE + ROW_START_INDEX;
+            const y = i * CELL_SIZE + COL_START_INDEX;
+        
+            if (gridData[i][j] == null) {
+                gridData[i][j] = {
+                    row: i,
+                    col: j,
+                    left: x,
+                    top: y,
+                    right: x + CELL_SIZE - CELL_BORDER_SIZE,
+                    bottom: y + CELL_SIZE - CELL_BORDER_SIZE,
+                    state: gridState[i][j],
+                    isOpen: false,
+                    isError: false
+                }
+            }
+        }
+    }
+
+
 }
 
 function checkGrid() {
@@ -603,20 +631,6 @@ function drawGridCell(i, j) {
     const x = j * CELL_SIZE + ROW_START_INDEX;
     const y = i * CELL_SIZE + COL_START_INDEX;
 
-    if (gridData[i][j] == null) {
-        gridData[i][j] = {
-            row: i,
-            col: j,
-            left: x,
-            top: y,
-            right: x + CELL_SIZE - CELL_BORDER_SIZE,
-            bottom: y + CELL_SIZE - CELL_BORDER_SIZE,
-            state: gridState[i][j],
-            isOpen: false,
-            isError: false
-        }
-    }
-
     drawRoundedRect(x, y, CELL_SIZE - CELL_BORDER_SIZE, CELL_SIZE - CELL_BORDER_SIZE, CORNER_RADIUS, color.grid);
 
     const cell = gridData[i][j]
@@ -641,6 +655,14 @@ function drawGrid() {
     const colCounts = Array.from({
         length: COLS
     }, () => 0);
+
+    for (let i = 0 ; i <= ROWS / 5; i++) {
+        for (let j = 0 ; j < COLS / 5; j++) {
+            let x = 5 * j * CELL_SIZE + ROW_START_INDEX;
+            let y = 5 * i * CELL_SIZE + COL_START_INDEX;
+            drawRoundedRect(x, y, CELL_SIZE * 5, CELL_SIZE * 5, CORNER_RADIUS, null, color.bigGrid);
+        }
+    }
 
     gridState.forEach((row, i) => {
         let count = 0;
