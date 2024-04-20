@@ -823,11 +823,11 @@ function initVue() {
             },
             OnAutoOpenChanged(value) {
                 if (value == '智能') {
-
+                    promptLevel = 1;
                 } else if (value == '普通') {
-
+                    promptLevel = 2;
                 } else if (value == '无') {
-
+                    promptLevel = 3;
                 } else {
                     console.log(value);
                 }
