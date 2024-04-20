@@ -4,8 +4,14 @@ let clickState = 1;
 let errorCount = 0;
 // 等级: 1初级，2中级，3高级
 let level = 1;
+// 难度等级：1菜鸟，2普通，3专家
+let difficultyLevel = 2;
+// 提示等级：1智能，2普通，3无
+let promptLevel = 2;
 // 自动空白填充
 let autoOpenBlank = true;
+// 背景音效
+let backgroundMusic = true;
 
 let ROWS = 10;
 let COLS = 10;
@@ -40,14 +46,14 @@ let gridState = [];
 let gridData = [];
 
 const svg = {
-    u2705 : null,
-    u274e : null
+    u2705: null,
+    u274e: null
 }
 
 async function loadSVG(src) {
     return new Promise((resolve, reject) => {
         let res = new Image();
-        res.onload = function() {
+        res.onload = function () {
             resolve(res);
         }
         res.src = src;
@@ -55,7 +61,7 @@ async function loadSVG(src) {
 }
 
 async function loadResource() {
-    
+
     let u2705 = await loadSVG('./res/Fxemoji_u2705.svg');
     svg.u2705 = u2705;
 
@@ -63,16 +69,51 @@ async function loadResource() {
     svg.u274e = u274e;
 }
 
-// Initialize grid
-function initGrid() {
-    errorCount = 0;
+function initializeGridState() {
+    let gridState = []; // 初始化格子状态数组
+    let gridData = [];
+
+    // 根据难度设置的目标百分比
+    let targetPercentage;
+    switch (difficultyLevel) {
+        case 1:
+            targetPercentage = 0.80; // 难度等级1的时候为30%
+            break;
+        case 2:
+            targetPercentage = 0.50; // 难度等级2的时候为50%
+            break;
+        case 3:
+            targetPercentage = 0.30; // 难度等级3的时候为80%
+            break;
+        default:
+            targetPercentage = 0.80; // 默认等级设置为30%
+    }
+
+    // 初始化格子，根据难度百分比来设置格子为1的概率
     for (let i = 0; i < ROWS; i++) {
-        gridState.push([]);
-        gridData.push([]);
+        gridState[i] = [];
+        gridData[i] = [];
         for (let j = 0; j < COLS; j++) {
-            gridState[i][j] = Math.round(Math.random());
+            // 使用随机数与目标百分比比较，决定是否将格子设置为1
+            gridState[i][j] = Math.random() < targetPercentage ? 1 : 0;
         }
     }
+
+    // 返回初始化好的数组
+    return {
+        gridState,
+        gridData
+    };
+}
+
+// Initialize grid
+function initGrid() {
+    // 清空错误数量
+    errorCount = 0;
+    // 重置格子
+    let initData = initializeGridState();
+    gridData = initData.gridData;
+    gridState = initData.gridState;
 
     checkGrid();
 
@@ -87,7 +128,7 @@ function checkGrid() {
         changed = changed || ret;
     }
 
-    for (let i = 0 ; i < COLS; i++) {
+    for (let i = 0; i < COLS; i++) {
         let ret = checkGridCol(i);
         changed = changed || ret;
     }
@@ -116,7 +157,7 @@ function countConsecutiveOnesSimple(arr) {
 
 function getRowZeroIndex(rows) {
     let results = [];
-    for (let i = 0 ; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
         if (rows[i] == 0) {
             results.push(i);
         }
@@ -128,7 +169,7 @@ function getRowZeroIndex(rows) {
 // check one row has only 5 numbers
 function checkGridRow(row) {
     let ret = false;
-    while(true) {
+    while (true) {
         let rowDatas = gridState[row];
         let rowOnes = countConsecutiveOnesSimple(rowDatas);
         if (rowOnes.length <= 5) {
@@ -146,9 +187,9 @@ function checkGridRow(row) {
 // check one col has only 5 numbers
 function checkGridCol(col) {
     let ret = false;
-    while(true) {
+    while (true) {
         let rowDatas = [];
-        for (let i = 0 ; i < ROWS; i++) {
+        for (let i = 0; i < ROWS; i++) {
             rowDatas[i] = gridState[i][col];
         }
         let rowOnes = countConsecutiveOnesSimple(rowDatas);
@@ -185,15 +226,15 @@ function drawRoundedRect(x, y, width, height, radius, fillStyle, strokeStyle) {
 
 function rectLeftToCenter(x, y, width, height) {
     return {
-        x : x + width / 2,
-        y : y + height / 2
+        x: x + width / 2,
+        y: y + height / 2
     }
 }
 
 function rectCenterToLeft(x, y, width, height) {
     return {
-        x : x - width / 2,
-        y : y - height / 2
+        x: x - width / 2,
+        y: y - height / 2
     }
 }
 
@@ -203,7 +244,7 @@ function drawStateSwitchRadioButton(x, y, width, height, radius) {
     const rectHeight = height / 4;
     const center = rectLeftToCenter(x, y, width, height);
     const left = rectCenterToLeft(center.x, center.y, rectWidth, rectHeight);
-    left.y  -= rectHeight / 3;
+    left.y -= rectHeight / 3;
 
     drawRoundedRect(left.x, left.y, rectWidth, rectHeight, radius, '#FFFFFF');
 
@@ -212,16 +253,16 @@ function drawStateSwitchRadioButton(x, y, width, height, radius) {
         fillStyle: color.textError,
         font: '16px Arial'
     });
-    
+
     // 画切换按钮
     if (clickState == 1) {
         // drawRoundedRect(left.x, left.y, rectWidth / 2 - radius, rectHeight - radius, radius, '#00B86B')
         // 在居中位置写上√
-        ctx.drawImage(svg.u2705, left.x , left.y , rectWidth / 2, rectHeight )
+        ctx.drawImage(svg.u2705, left.x, left.y, rectWidth / 2, rectHeight)
     } else {
         drawRoundedRect(left.x + rectWidth / 2, left.y, rectWidth / 2, rectHeight, radius, '#00B86B')
         // 在居中位置写上×
-        ctx.drawImage(svg.u274e, left.x + rectWidth / 2 , left.y , rectWidth / 2, rectHeight)
+        ctx.drawImage(svg.u274e, left.x + rectWidth / 2, left.y, rectWidth / 2, rectHeight)
     }
 }
 
@@ -240,7 +281,7 @@ function drawText(text, x, y, options) {
     // else {
     //     ctx.textBaseline = 'middle';
     // }
-    
+
     if (options != null && options.textAlign != null) {
         ctx.textAlign = options.textAlign;
     } else {
@@ -252,7 +293,7 @@ function drawText(text, x, y, options) {
     } else {
         ctx.fillStyle = color.text;
     }
-    
+
     ctx.fillText(text, x, y);
     ctx.restore();
 }
@@ -268,25 +309,24 @@ function drawTextArray(textArray, x, y, direction) {
             throw new Error('text is invalid');
         }
 
-        for (let i = 0 ; i < textArray.length; i++) {
-            let x_pos = x + (maxCount - textArray.length + i) * ROW_STEP ;
+        for (let i = 0; i < textArray.length; i++) {
+            let x_pos = x + (maxCount - textArray.length + i) * ROW_STEP;
             if (textArray[i].full) {
                 options.fillStyle = color.textFull
             } else {
                 options.fillStyle = color.textRaw
             }
-            
+
             drawText(textArray[i].count, x_pos, y + COL_STEP / 2, options);
         }
 
-    }
-    else if (direction == 'h' || direction == 'H') {
+    } else if (direction == 'h' || direction == 'H') {
         let maxCount = COL_START_INDEX / COL_STEP;
         if (textArray.length > maxCount) {
             throw new Error('text is invalid');
         }
 
-        for (let i = 0 ; i < textArray.length; i++) {
+        for (let i = 0; i < textArray.length; i++) {
             let y_pos = y + (maxCount - textArray.length + i) * COL_STEP;
             if (textArray[i].full) {
                 options.fillStyle = color.textFull
@@ -337,7 +377,7 @@ function countConsecutiveOnes(arr) {
 
 function getRowData(row) {
     let rowData = [];
-    for (let i = 0 ; i < COLS; i++) {
+    for (let i = 0; i < COLS; i++) {
         rowData.push({
             state: gridState[row][i],
             row: row,
@@ -368,11 +408,11 @@ function drawCountBox() {
     for (let col = 0; col < COLS; col++) {
         drawRoundedRect(COL_START_INDEX + col * CELL_SIZE, 0,
             CELL_SIZE - CELL_BORDER_SIZE, ROW_START_INDEX - CELL_BORDER_SIZE, CORNER_RADIUS, color.label);
-        
+
         let colData = getColData(col);
         let colArray = countConsecutiveOnes(colData);
         drawTextArray(colArray, ROW_START_INDEX + col * CELL_SIZE + CELL_BORDER_SIZE * 3, 0, 'h');
-        checkFullColGrid(col, colArray); 
+        checkFullColGrid(col, colArray);
     }
 
     for (let row = 0; row < ROWS; row++) {
@@ -380,14 +420,14 @@ function drawCountBox() {
             COL_START_INDEX - CELL_BORDER_SIZE, CELL_SIZE - CELL_BORDER_SIZE, CORNER_RADIUS, color.label);
 
         let rowData = getRowData(row);
-        let rowArray = countConsecutiveOnes(rowData); 
+        let rowArray = countConsecutiveOnes(rowData);
         drawTextArray(rowArray, 0, COL_START_INDEX + row * CELL_SIZE + CELL_SIZE / 2, 'v');
         checkFullRowGrid(row, rowArray);
     }
 }
 
 function openCol(col, start, end) {
-    for (let i = start ; i < end; i++) {
+    for (let i = start; i < end; i++) {
         gridData[i][col].isOpen = true;
     }
 }
@@ -398,17 +438,7 @@ function openRow(row, start, end) {
     }
 }
 
-/**
- * 
- * @param {number} col 
- * @param {{count: number, full: boolean, from: number, to: number}[]} colArray 
- * @returns 
- */
-function checkFullColGrid(col, colArray) {
-    if (!autoOpenBlank || colArray.length <= 0) {
-        return;
-    }
-    
+function intelligentCheckFullColGrid(col, colArray) {
     // 第一个
     if (colArray[0].full) {
         openCol(col, 0, colArray[0].from);
@@ -420,7 +450,7 @@ function checkFullColGrid(col, colArray) {
             } else {
                 openCol(col, colArray[0].to, colArray[0].to + 1);
             }
-        } 
+        }
     }
 
     let last = colArray.length - 1;
@@ -443,7 +473,7 @@ function checkFullColGrid(col, colArray) {
             } else {
                 openCol(col, colArray[i].from - 1, colArray[i].from);
             }
-            
+
             if (colArray[i + 1].full) {
                 openCol(col, colArray[i].to, colArray[i + 1].from);
             } else {
@@ -453,17 +483,42 @@ function checkFullColGrid(col, colArray) {
     }
 }
 
+function normalCheckFullColGrid(col, colArray) {
+
+    let isAllOpen = true;
+    for (let colData of colArray) {
+        if (!colData.full) {
+            isAllOpen = false;
+            break;
+        }
+    }
+
+    if (isAllOpen) {
+        for (let i = 0; i < ROWS; i++) {
+            gridData[i][col].isOpen = true;
+        }
+    }
+}
+
 /**
  * 
  * @param {number} col 
- * @param {{count: number, full: boolean, from: number, to: number}[]} rowArray 
+ * @param {{count: number, full: boolean, from: number, to: number}[]} colArray 
  * @returns 
  */
-function checkFullRowGrid(row, rowArray) {
-    if (!autoOpenBlank || rowArray.length <= 0) {
+function checkFullColGrid(col, colArray) {
+    if (promptLevel == 3 || colArray.length <= 0) {
         return;
     }
-    
+
+    if (promptLevel == 1) {
+        intelligentCheckFullColGrid(col, colArray);
+    } else if (promptLevel == 2) {
+        normalCheckFullColGrid(col, colArray);
+    }
+}
+
+function intelligentCheckFullRowGrid(row, rowArray) {
     // 第一个
     if (rowArray[0].full) {
         openRow(row, 0, rowArray[0].from);
@@ -475,7 +530,7 @@ function checkFullRowGrid(row, rowArray) {
             } else {
                 openRow(row, rowArray[0].to, rowArray[0].to + 1);
             }
-        } 
+        }
     }
 
     let last = rowArray.length - 1;
@@ -486,7 +541,7 @@ function checkFullRowGrid(row, rowArray) {
         } else {
             openRow(row, rowArray[last].from - 1, rowArray[last].from);
         }
-        
+
         openRow(row, rowArray[last].to, COLS);
     }
 
@@ -498,14 +553,49 @@ function checkFullRowGrid(row, rowArray) {
             } else {
                 openRow(row, rowArray[i].from - 1, rowArray[i].from);
             }
-            
+
             if (rowArray[i + 1].full) {
                 openRow(row, rowArray[i].to, rowArray[i + 1].from);
             } else {
                 openRow(row, rowArray[i].to, rowArray[i].to + 1);
             }
-            
+
         }
+    }
+}
+
+function normalCheckFullRowGrid(row, rowArray) {
+    let isAllOpen = true;
+    for (let rowData of rowArray) {
+        if (!rowData.full) {
+            isAllOpen = false;
+            break;
+        }
+    }
+
+    if (isAllOpen) {
+        for (let i = 0; i < COLS; i++) {
+            gridData[row][i].isOpen = true;
+        }
+    }
+}
+
+/**
+ * 
+ * @param {number} col 
+ * @param {{count: number, full: boolean, from: number, to: number}[]} rowArray 
+ * @returns 
+ */
+function checkFullRowGrid(row, rowArray) {
+
+    if (promptLevel == 3 || rowArray.length <= 0) {
+        return;
+    }
+
+    if (promptLevel == 1) {
+        intelligentCheckFullRowGrid(row, rowArray);
+    } else if (promptLevel == 2) {
+        normalCheckFullRowGrid(row, rowArray);
     }
 }
 
@@ -528,14 +618,14 @@ function drawGridCell(i, j) {
     }
 
     drawRoundedRect(x, y, CELL_SIZE - CELL_BORDER_SIZE, CELL_SIZE - CELL_BORDER_SIZE, CORNER_RADIUS, color.grid);
-    
+
     const cell = gridData[i][j]
     if (cell.isOpen) {
         if (cell.state == 1) {
-            ctx.drawImage(svg.u2705, cell.left + CORNER_RADIUS / 2, cell.top + CORNER_RADIUS / 2, 
+            ctx.drawImage(svg.u2705, cell.left + CORNER_RADIUS / 2, cell.top + CORNER_RADIUS / 2,
                 cell.right - cell.left - CORNER_RADIUS, cell.bottom - cell.top - CORNER_RADIUS)
         } else {
-            ctx.drawImage(svg.u274e, cell.left + CORNER_RADIUS / 2, cell.top + CORNER_RADIUS / 2, 
+            ctx.drawImage(svg.u274e, cell.left + CORNER_RADIUS / 2, cell.top + CORNER_RADIUS / 2,
                 cell.right - cell.left - CORNER_RADIUS, cell.bottom - cell.top - CORNER_RADIUS)
         }
     }
@@ -575,10 +665,10 @@ function isSwitchButtonClick(x, y) {
 function findClickedCell(posX, posY) {
     for (let row of gridData) {
         for (let cell of row) {
-            if (cell.left <= posX && cell.right >= posX 
-                && cell.top <= posY && cell.bottom >= posY) {
-                    return cell;
-                }
+            if (cell.left <= posX && cell.right >= posX &&
+                cell.top <= posY && cell.bottom >= posY) {
+                return cell;
+            }
         }
     }
 
@@ -596,7 +686,7 @@ function onChangeSwitchState() {
 }
 
 function onGridCellClick(cell) {
-    
+
     if (cell.isOpen) {
         return;
     }
@@ -633,7 +723,7 @@ function onCanvasClick(ev) {
 // Check game status
 function checkGameOver() {
     let isOver = true;
-    for (let i = 0 ; i <ROWS; i++ ) {
+    for (let i = 0; i < ROWS; i++) {
         for (let j = 0; j < COLS; j++) {
             if (!gridData[i][j].isOpen) {
                 isOver = false;
@@ -648,13 +738,13 @@ function checkGameOver() {
     if (isOver) {
         if (errorCount == 0) {
             setTimeout(() => {
-                alert ('恭喜你，完美过关');
+                alert('恭喜你，完美过关');
                 main();
             }, 500);
-            
+
         } else {
             setTimeout(() => {
-                alert (`游戏结束，本局中你一共失误${errorCount}次`);
+                alert(`游戏结束，本局中你一共失误${errorCount}次`);
                 main();
             }, 500)
         }
@@ -674,28 +764,60 @@ function initVue() {
         el: '#app',
         data() {
             return {
-                radio1: '初级',
-                checked: true
+                radio1: '10',
+                radio2: '普通',
+                radio3: '普通',
+                radio4: '开',
             };
         },
         methods: {
-            onLevelChanged(value) {
-                if (value == '初级') {
+            onGridLevelChanged(value) {
+                if (value == '10') {
                     level = 1;
                     main();
-                } else if (value == '中级') {
+                } else if (value == '15') {
                     level = 2;
                     main();
-                } else if (value == '高级') {
+                } else if (value == '20') {
                     level = 3;
                     main();
                 } else {
                     console.log(value)
                 }
             },
+            onFlagLevelChanged(value) {
+                if (value == '菜鸟') {
+                    difficultyLevel = 1;
+                    main();
+                } else if (value == '普通') {
+                    difficultyLevel = 2;
+                    main();
+                } else if (value == '专家') {
+                    difficultyLevel = 3;
+                    main();
+                } else {
+                    console.log(value);
+                }
+            },
             OnAutoOpenChanged(value) {
-                // console.log(value);
-                autoOpenBlank = value;
+                if (value == '智能') {
+
+                } else if (value == '普通') {
+
+                } else if (value == '无') {
+
+                } else {
+                    console.log(value);
+                }
+            },
+            onMusicChanged(value) {
+                if (value == '开') {
+                    backgroundMusic = true;
+                    playMusic(true);
+                } else {
+                    backgroundMusic = false;
+                    playMusic(false);
+                }
             }
         }
     });
@@ -704,7 +826,7 @@ function initVue() {
 function initConfig() {
     clickState = 1;
     errorCount = 0;
-    
+
     gridState = [];
     gridData = [];
 
@@ -731,18 +853,32 @@ function initConfig() {
 }
 
 let isSetAutoPlayEvent = false;
+
 function autoPlaySound() {
     if (isSetAutoPlayEvent) {
         return;
     }
     isSetAutoPlayEvent = true;
     document.addEventListener('click', () => {
-        document.querySelector("audio").play();
+        if (backgroundMusic) {
+            document.querySelector("audio").play();
+        }
+
     });
     // 监听鼠标移动的事件
     document.addEventListener('mousemove', () => {
-        document.querySelector("audio").play();
+        if (backgroundMusic) {
+            document.querySelector("audio").play();
+        }
     });
+}
+
+function playMusic(isPlay) {
+    if (isPlay) {
+        document.querySelector("audio").play();
+    } else {
+        document.querySelector("audio").pause();
+    }
 }
 
 async function main() {
@@ -754,7 +890,7 @@ async function main() {
     initGrid();
     initVue();
     autoPlaySound();
-    
+
     canvas.addEventListener('click', onCanvasClick);
 }
 
