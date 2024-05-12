@@ -78,16 +78,16 @@ function initializeGridState() {
     let targetPercentage;
     switch (difficultyLevel) {
         case 1:
-            targetPercentage = 0.80; // 难度等级1的时候为30%
+            targetPercentage = 0.80; // 难度等级1的时候为80%
             break;
         case 2:
-            targetPercentage = 0.50; // 难度等级2的时候为50%
+            targetPercentage = 0.65; // 难度等级2的时候为65%
             break;
         case 3:
-            targetPercentage = 0.30; // 难度等级3的时候为80%
+            targetPercentage = 0.50; // 难度等级3的时候为50%
             break;
         default:
-            targetPercentage = 0.80; // 默认等级设置为30%
+            targetPercentage = 0.80; // 默认等级设置为80%
     }
 
     // 初始化格子，根据难度百分比来设置格子为1的概率
