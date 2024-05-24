@@ -84,7 +84,7 @@ function initializeGridState() {
             targetPercentage = 0.65; // 难度等级2的时候为65%
             break;
         case 3:
-            targetPercentage = 0.50; // 难度等级3的时候为50%
+            targetPercentage = 0.40; // 难度等级3的时候为50%
             break;
         default:
             targetPercentage = 0.80; // 默认等级设置为80%
