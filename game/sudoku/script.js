@@ -416,16 +416,16 @@ function generateSudokuGame(difficulty) {
     // Example implementation of difficulty-based generation
     let cellsToRemove;
     switch (difficulty) {
-        case 1:
+        case 'easy':
           cellsToRemove = 20; // Easy
           break;
-        case 2:
+        case 'medium':
           cellsToRemove = 40; // Medium
           break;
-        case 3:
+        case 'hard':
           cellsToRemove = 54; // Hard
           break;
-        case 4:
+        case 'expert':
           cellsToRemove = 62; // Very Hard
           break;
         default:
