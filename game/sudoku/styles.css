@@ -1,0 +1,105 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(9, 45px);
+    grid-template-rows: repeat(1, 45px);
+    gap: 5px;
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cell.selected {
+    background-color: #a0d3e8; /* 选中状态的常见背景色 */
+}
+
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+button {
+    margin: 0 10px;
+}
+
+canvas {
+    border: 1px solid black; /* 可选：添加边框以便于查看 */
+}
+
+.hidden {
+    display: none !important;
+}
+
+#dialog {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 20px;
+    background: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 300px;  /* Increased width for better fit */
+    height: auto;  /* Auto height to adjust based on content */
+    max-height: 400px; /* Maximum height to ensure it doesn't become too tall */
+    overflow-y: auto; /* Add vertical scrolling if the content is too tall */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.difficulty-button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    width: 100%;  /* Make buttons span the width of the dialog */
+    box-sizing: border-box;  /* Ensure padding is included in width */
+}
+
+#close-dialog {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}

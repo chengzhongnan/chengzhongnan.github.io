@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Sudoku" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="./dlxlib/dataObject.js" type="module"></script>
+    <script src="./dlxlib/columnObject.js" type="module"></script>
+    <script src="./dlxlib/dlx.js" type="module"></script>
+    
+    <script src="sudoku.js" type="module"></script>
+</head>
+<body>
+    <div class="grid-container">
+        <div class="grid">
+            <div class="cell" data-value="1">1</div>
+            <div class="cell" data-value="2">2</div>
+            <div class="cell" data-value="3">3</div>
+            <div class="cell" data-value="4">4</div>
+            <div class="cell" data-value="5">5</div>
+            <div class="cell" data-value="6">6</div>
+            <div class="cell" data-value="7">7</div>
+            <div class="cell" data-value="8">8</div>
+            <div class="cell" data-value="9">9</div>
+        </div>
+    </div>
+    <div id="dialog">
+        <div class="dialog-content">
+            <h2>选择难度</h2>
+            <button class="difficulty-button" data-difficulty="easy">初级</button>
+            <button class="difficulty-button" data-difficulty="medium">中级</button>
+            <button class="difficulty-button" data-difficulty="hard">高级</button>
+            <button class="difficulty-button" data-difficulty="expert">专家</button>
+            <button id="close-dialog">关闭</button>
+        </div>
+    </div>
+    <div class="canvas-container">
+        <canvas id="sudokuCanvas" width="450" height="450"></canvas>
+    </div>
+    <div class="button-container">
+        <button id="newGame">新游戏</button>
+        <button id="reset">重玩</button>
+        <button id="undo">撤销</button>
+        <button id="hitTree">提示树: 关</button>
+        <button id="hint">提示</button>
+    </div>
+    <img id="completionGif" src="win.gif" style="display:none;" />
+    <script src="script.js" type="module"></script>
+</body>
+</html>
