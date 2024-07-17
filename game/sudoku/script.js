@@ -9,6 +9,7 @@ const HINT_BUTTON_ID = 'hint';
 const NEW_GAME_BUTTON_ID = 'newGame';
 const HIT_TREE_BUTTON_ID = 'hitTree';
 const RESET_BUTTON_ID = 'reset';
+const BRANCH_BUTTON_ID = 'branch';
 const CELL_SIZE = 50;
 const GRID_SIZE = 9;
 const SELECTED_CELL_COLOR = '#a0d3e8';
@@ -18,8 +19,11 @@ const ANIMATION_DURATION = 500;
 const START_COLOR = '#ffffff';
 const END_COLOR = '#ff0000';
 const ERROR_COLOR = '#cf0000';
+const BRANCH_FONT_COLOR = '#cccc00';
 const NOTE_ACTIVE_TEXT = '提示树: 开';
 const NOTE_INACTIVE_TEXT = '提示树: 关';
+const BRANCH_ACTIVE_TEXT = '分支：开';
+const BRANCH_INACTIVE_TEXT = '分支：关';
 
 const animationDuration = 1000; // 提示动画持续时间
 const fontSizeIncrement = 0.5; // 字体大小增加的步幅
@@ -32,8 +36,11 @@ let puzzleMatrix = [];  // 2D array to store the puzzle values
 let fillGridOrder = [];
 let solveMatrix = [];  // 2D array to store the solution values
 
+let startShowBranchIndex = GRID_SIZE * GRID_SIZE * GRID_SIZE; // 分支显示起始索引
+
 let isShowHitTree = false;
 let isShowHitAnimate = false;
+let isShowBranch = false;
 
 function drawCanvas() {
     drawGrid();
@@ -144,7 +151,11 @@ function fillCell(row, col, value) {
     const existingIndex = fillGridOrder.findIndex(item => item.row === row && item.col === col);
     if (existingIndex !== -1) {
         if (fillGridOrder[existingIndex].isValid) {
-            ctx.fillStyle = DEFAULT_FONT_COLOR;
+            if (isShowBranch  && fillGridOrder[existingIndex].index >= startShowBranchIndex) {
+                ctx.fillStyle = BRANCH_FONT_COLOR;
+            } else {
+                ctx.fillStyle = DEFAULT_FONT_COLOR;
+            }
         }
         else {
             ctx.fillStyle = ERROR_COLOR;
@@ -447,6 +458,20 @@ function initGameEvents() {
             isShowHitTree = true;
             hitTreeButton.textContent = NOTE_ACTIVE_TEXT;
             drawCanvas();
+        }
+    });
+
+    const branchButton = document.getElementById(BRANCH_BUTTON_ID);
+    branchButton.addEventListener('click', () => {
+        if (isShowBranch) {
+            isShowBranch = false;
+            branchButton.textContent = BRANCH_INACTIVE_TEXT;
+            
+        } else {
+            isShowBranch = true;
+            branchButton.textContent = BRANCH_ACTIVE_TEXT;
+            let maxOrder = fillGridOrder.reduce((max, item) => max > item.index ? max : item.index, 0);
+            startShowBranchIndex = maxOrder + 1; // 从下一个单元格开始显示分支
         }
     });
 
