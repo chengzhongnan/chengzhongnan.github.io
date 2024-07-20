@@ -5,12 +5,16 @@
             "name": "常用软件"
         },
         {
-            "type": "game",
-            "name": "游戏"
+            "type": "communication",
+            "name": "通讯软件"
         },
         {
             "type": "office",
             "name": "办公软件"
+        },
+        {
+            "type": "networking",
+            "name": "网络工具"
         },
         {
             "type": "education",
@@ -29,6 +33,10 @@
             "name": "视频软件"
         },
         {
+            "type": "game",
+            "name": "游戏"
+        },
+        {
             "type": "security",
             "name": "安全软件"
         },
@@ -41,10 +49,6 @@
             "name": "开发工具"
         },
         {
-            "type": "networking",
-            "name": "网络工具"
-        },
-        {
             "type": "finance",
             "name": "财务软件"
         },
@@ -55,10 +59,6 @@
         {
             "type": "lifestyle",
             "name": "生活软件"
-        },
-        {
-            "type": "communication",
-            "name": "通讯软件"
         }
     ],
     "softwares": [

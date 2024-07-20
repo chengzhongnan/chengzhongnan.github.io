@@ -37,6 +37,11 @@ nav ul li a {
     font-weight: 700;
 }
 
+nav ul li a.active {
+    color: #006400;;
+    font-weight: bold;
+}
+
 main {
     max-width: 1200px;
     margin: 20px auto;

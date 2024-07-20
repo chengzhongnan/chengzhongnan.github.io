@@ -12,11 +12,19 @@ function createDocument(jsonData) {
 
 function createNavDom(jsonData) {
     const navList = document.getElementById('nav-list');
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const categoryType = urlParams.get('category');
     jsonData.schema.forEach(category => {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = `${window.location.pathname}?category=${category.type}`;
         a.textContent = category.name;
+
+        if (category.type === categoryType) {
+            a.classList.add('active');
+        }
+
         li.appendChild(a);
         navList.appendChild(li);
     });
@@ -26,11 +34,8 @@ function createSoftwareDom(jsonData) {
     // 根据showIndex排序软件
     jsonData.softwares.sort((a, b) => b.showIndex - a.showIndex);
 
-    // 从URL中取出分类
     const queryString = window.location.search;
-    // 使用URLSearchParams解析查询字符串
     const urlParams = new URLSearchParams(queryString);
-    // 获取category参数的值
     const category = urlParams.get('category');
     let categoryIndex = -1;
     if (category !== null && jsonData.schema.find(x => x.type == category) !== null) {
@@ -56,8 +61,8 @@ function createSoftwareDom(jsonData) {
         const title = document.createElement('h2');
         title.textContent = software.name;
 
-        const desc = document.createElement('p');
-        desc.textContent = software.desc;
+        // const desc = document.createElement('p');
+        // desc.textContent = software.desc;
 
         const info = document.createElement('p');
         info.textContent = software.info;
@@ -67,7 +72,7 @@ function createSoftwareDom(jsonData) {
         downloadLink.textContent = '下载';
 
         cardContent.appendChild(title);
-        cardContent.appendChild(desc);
+        // cardContent.appendChild(desc);
         cardContent.appendChild(info);
         cardContent.appendChild(downloadLink);
 
