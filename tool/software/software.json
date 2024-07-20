@@ -1,0 +1,192 @@
+{
+    "schema": [
+        {
+            "type": "tool",
+            "name": "常用软件"
+        },
+        {
+            "type": "game",
+            "name": "游戏"
+        },
+        {
+            "type": "office",
+            "name": "办公软件"
+        },
+        {
+            "type": "education",
+            "name": "教育软件"
+        },
+        {
+            "type": "graphics",
+            "name": "图形图像"
+        },
+        {
+            "type": "audio",
+            "name": "音频软件"
+        },
+        {
+            "type": "video",
+            "name": "视频软件"
+        },
+        {
+            "type": "security",
+            "name": "安全软件"
+        },
+        {
+            "type": "utility",
+            "name": "实用程序"
+        },
+        {
+            "type": "development",
+            "name": "开发工具"
+        },
+        {
+            "type": "networking",
+            "name": "网络工具"
+        },
+        {
+            "type": "finance",
+            "name": "财务软件"
+        },
+        {
+            "type": "health",
+            "name": "健康软件"
+        },
+        {
+            "type": "lifestyle",
+            "name": "生活软件"
+        },
+        {
+            "type": "communication",
+            "name": "通讯软件"
+        }
+    ],
+    "softwares": [
+        {
+            "name": "Office Professional Plus 2019",
+            "type": "office",
+            "desc": "文档处理",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzJwIRFADEzm5x0lGbr2MZTXSNCC8eqeSCpg&s",
+            "info": "Microsoft Office 2019是Microsoft Office的一个版本，为Office 2016的下一版。这个版本在2017年9月6日于Microsoft Ignite公布，于2018年9月24日发布。",
+            "downloadUrl": "ed2k://|file|cn_office_professional_plus_2019_x86_x64_dvd_5e5be643.iso|3775004672|1E4FFA5240F21F60DC027F73F1C62FF4|/",
+            "showIndex": 1
+        },
+        {
+            "name": "金山WPS",
+            "type": "office",
+            "desc": "文档处理",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWjXDJxWSiVrbwdDhAm68LIhO-SaiPTi8DqQ&s",
+            "info": "WPS Office是由金山软件股份有限公司发布的一款办公软件包，用于办公软件最常用的文字编辑、表格、演示稿等功能。覆盖Windows、MacOS、Linux、Android、iOS等平台",
+            "downloadUrl": "https://official-package.wpscdn.cn/wps/download/WPS_Setup_17147.exe",
+            "showIndex": 2
+        },
+        {
+            "name": "微信",
+            "type": "communication",
+            "desc": "通信工具",
+            "image": "https://images-eds-ssl.xboxlive.com/image?url=4rt9.lXDC4H_93laV1_eHHFT949fUipzkiFOBH3fAiZZUCdYojwUyX2aTonS1aIwMrx6NUIsHfUHSLzjGJFxxl33gjvYDEfZR.qiz4WDwgZdACWjuHvdtdBN.f6bmfYuJiD9iqKPDhfWOMJ5xCtF0Xa9I2_rlNAVF9a2pSYxoEk-&format=source",
+            "info": "微信是腾讯公司于2011年1月21日推出的一款支持Android以及iOS等移动操作系统的即时通信软件，其面对智能手机用户。",
+            "downloadUrl": "https://dldir1v6.qq.com/weixin/Windows/WeChatSetup.exe",
+            "showIndex": 3
+        },
+        {
+            "name": "QQ",
+            "type": "communication",
+            "desc": "通信工具",
+            "image": "https://wiki.connect.qq.com/wp-content/uploads/2013/10/01_qq_logo-1-300x144.png",
+            "info": "腾讯QQ是一款由腾讯公司推出的即时通讯软件，支持Windows、Mac、Linux、Android、iOS等操作系统。",
+            "downloadUrl": "https://dldir1.qq.com/qqfile/qq/QQNT/Windows/QQ_9.9.11_240606_x64_01.exe",
+            "showIndex": 4
+        },
+        {
+            "name": "企业微信",
+            "type": "communication",
+            "desc": "通信工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaJ4eEV6EXOyQdQPBurvf_jgDut25V0XqpSg&s",
+            "info": "企业微信是一款由腾讯公司推出的即时通讯软件，支持Windows、Mac、Linux、Android、iOS等操作系统。",
+            "downloadUrl": "https://dldir1.qq.com/wework/work_weixin/WeCom_4.1.27.8111.exe",
+            "showIndex": 5
+        },
+        {
+            "name": "toDesk",
+            "type": "networking",
+            "desc": "远程控制",
+            "image": "https://www.todesk.com/dist/img/90fde7a.png",
+            "info": "toDesk是一款办公软件，支持Windows、Mac、Linux、Android、iOS等操作系统。",
+            "downloadUrl": "https://dl.todesk.com/windows/ToDesk.exe",
+            "showIndex": 6
+        },
+        {
+            "name": "TeamViewer",
+            "type": "networking",
+            "desc": "远程控制",
+            "image": "https://www.chip.de/ii/3/6/8/6/2/4/0/teamviewer.gif-b41a7f7a9adba924.png",
+            "info": "TeamViewer 是一款用于远程访问以及远程控制和远程维护计算机和其他终端设备的软件，发布于2005 年。功能性被逐步扩大，不久前经过TeamViewer Meeting 集成。TeamViewer 不需要注册，非商业领域免费使用，这有助于软件的广泛传播。",
+            "downloadUrl": "https://download.teamviewer.com/download/TeamViewer_Setup_x64.exe",
+            "showIndex": 7
+        },
+        {
+            "name": "LibreOffice",
+            "type": "office",
+            "desc": "办公软件",
+            "image": "https://i.pcmag.com/imagery/reviews/06ajIYT7R4AM7Fx9S9aUmBn-14.fit_lim.size_1050x.png",
+            "info": "LibreOffice是由文档基金会开发的自由及开放源代码的办公室套件。LibreOffice套件包含文字处理器、电子表格、演示文稿程序、矢量图形编辑器和图表工具、数据库管理程序及建立和编辑数学公式的应用程序。",
+            "downloadUrl": "https://www.libreoffice.org/donate/dl/win-x86_64/24.2.5/zh-CN/LibreOffice_24.2.5_Win_x86-64.msi",
+            "showIndex": 8
+        },
+        {
+            "name": "Evernote",
+            "type": "office",
+            "desc": "笔记软件",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6SJyRZIpyp8vWr5NYrv476VY97noSwAaF5g&s",
+            "info": "Evernote是一款笔记软件。由Stepan Pachikov创建的Evernote网络服务于2008年6月24日上线，2011年7月用户数量达到1100万。 2010年10月，Evernote公司获得了2000万美元的风险投资，这笔投资由红杉资本牵头，摩根泰勒风险投资公司和DoCoMo资本参与。",
+            "downloadUrl": "https://win.desktop.evernote.com/builds/Evernote-latest.exe",
+            "showIndex": 9
+        },
+        {
+            "name": "Foxit Reader",
+            "type": "tool",
+            "desc": "PDF阅读器",
+            "image": "https://images-eds-ssl.xboxlive.com/image?url=4rt9.lXDC4H_93laV1_eHHFT949fUipzkiFOBH3fAiZZUCdYojwUyX2aTonS1aIwMrx6NUIsHfUHSLzjGJFxxtoGVDYZsgZySrsJ7RMjtUdfTvVvAj7idX6TllwQh5D9esdPe2qMJIBWd.2lVq4ZrPujmZRtO27_O5xfoSy_Y9Q-&format=source&h=210",
+            "info": "福昕阅读器是一款多语言免费的PDF查看工具，可以用于创建、查看、数字签名和打印PDF文件。福昕阅读器由中国福州的福昕软件公司开发。早期版本以启动迅速和软件体积小巧著称。3.0版本开始就与Adobe Reader进行对比。有另外提供企业版，需要与相应账户绑定。",
+            "downloadUrl": "https://cdn78.foxitsoftware.com/product/reader/desktop/win/2024.2.2/FoxitPDFReader202422_enu_Setup_Prom.exe",
+            "showIndex": 10
+        },
+        {
+            "name": "Scrivener",
+            "type": "education",
+            "desc": "写作软件",
+            "image": "https://i.pcmag.com/imagery/reviews/01KJJJCE0KQ9sV8bQHB01gU-10..v1580488306.jpg",
+            "info": "Scrivener 是一款专为作家设计的文字处理程序和大纲工具。 Scrivener 提供文档、注释和元数据的管理系统。这允许用户组织笔记、概念、研究和整个文档，以便于访问和参考。 Scrivener 提供剧本、小说和非小说手稿的模板。",
+            "downloadUrl": "https://scrivener.s3.amazonaws.com/Scrivener-installer.exe",
+            "showIndex": 11
+        },
+        {
+            "name": "Grammarly",
+            "type": "education",
+            "desc": "英语语法检查",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJegCk-tk9EwNlZ6Br_GnM9LJcfsjhtngkpA&s",
+            "info": "Grammarly是一家总部位于美国的乌克兰技术公司，该公司提供基于人工智能和自然语言处理的数字写作辅助工具。Grammarly可以自动检测用户所书写的英文是否存在语法、拼写、标点等错误。",
+            "downloadUrl": "https://download-windows.grammarly.com/new_20/w/GrammarlyInstaller.exe",
+            "showIndex": 12
+        },
+        {
+            "name": "Typora",
+            "type": "development",
+            "desc": "Markdown编辑器",
+            "image": "https://typora.io/img/icon_256x256.png",
+            "info": "Typora是一款由Abner Lee开发的轻量级Markdown编辑器，适用于OS X、Windows和Linux三种操作系统。与其他Markdown编辑器不同的是，Typora没有采用源代码和预览双栏显示的方式，而是采用所见即所得的编辑方式，实现了即时预览的功能，但也可切换至源代码编辑模式。",
+            "downloadUrl": "https://download.typora.io/windows/typora-setup-x64.exe",
+            "showIndex": 13
+        },
+        {
+            "name": "Google Chrome",
+            "type": "tool",
+            "desc": "谷歌浏览器",
+            "image": "https://www.google.com/chrome/static/images/chrome-logo-new.webp",
+            "info": "Google Chrome是一款由Google开发的网页浏览器，由Google、Opera Software和Vivaldi等公司共同开发。Google Chrome是目前世界上使用最多的浏览器，它拥有超过1亿的用户，是全球最大的搜索引擎。",
+            "downloadUrl": "https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B8D6028AA-B9D0-9FA6-7102-9260756C7CAE%7D%26lang%3Den%26browser%3D4%26usagestats%3D1%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-statsdef_1%26installdataindex%3Dempty/update2/installers/ChromeSetup.exe",
+            "showIndex": 14
+        }
+    ]
+}
