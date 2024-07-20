@@ -15,7 +15,7 @@ function createNavDom(jsonData) {
     jsonData.schema.forEach(category => {
         const li = document.createElement('li');
         const a = document.createElement('a');
-        a.href = `/?category=${category.type}`;
+        a.href = `${window.location.pathname}?category=${category.type}`;
         a.textContent = category.name;
         li.appendChild(a);
         navList.appendChild(li);
