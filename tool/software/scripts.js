@@ -32,7 +32,7 @@ function createNavDom(jsonData) {
 
 function createSoftwareDom(jsonData) {
     // 根据showIndex排序软件
-    jsonData.softwares.sort((a, b) => b.showIndex - a.showIndex);
+    jsonData.softwares.sort((a, b) => a.showIndex - b.showIndex);
 
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
@@ -44,7 +44,7 @@ function createSoftwareDom(jsonData) {
 
     const softwareContainer = document.getElementById('software-container');
     jsonData.softwares.forEach(software => {
-        if (categoryIndex !== -1 && software.type !== category) return;
+        if (categoryIndex !== -1 && software.type.indexOf(category) === -1) return;
         const softwareCard = document.createElement('div');
         softwareCard.className = 'software-card';
 

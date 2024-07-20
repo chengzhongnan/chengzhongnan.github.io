@@ -21,16 +21,12 @@
             "name": "教育软件"
         },
         {
-            "type": "graphics",
+            "type": "design",
             "name": "图形图像"
         },
         {
-            "type": "audio",
-            "name": "音频软件"
-        },
-        {
-            "type": "video",
-            "name": "视频软件"
+            "type": "media",
+            "name": "多媒体软件"
         },
         {
             "type": "game",
@@ -64,7 +60,7 @@
     "softwares": [
         {
             "name": "Office Professional Plus 2019",
-            "type": "office",
+            "type": "office,tool",
             "desc": "文档处理",
             "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzJwIRFADEzm5x0lGbr2MZTXSNCC8eqeSCpg&s",
             "info": "Microsoft Office 2019是Microsoft Office的一个版本，为Office 2016的下一版。这个版本在2017年9月6日于Microsoft Ignite公布，于2018年9月24日发布。",
@@ -94,7 +90,7 @@
             "type": "communication",
             "desc": "通信工具",
             "image": "https://wiki.connect.qq.com/wp-content/uploads/2013/10/01_qq_logo-1-300x144.png",
-            "info": "腾讯QQ是一款由腾讯公司推出的即时通讯软件，支持Windows、Mac、Linux、Android、iOS等操作系统。",
+            "info": "腾讯QQ，或称QQ，是深圳市腾讯计算机股份有限公司于1999年2月11日推出的一款的多平台即时通信软件，支持文字、语音和视频聊天，以及远程控制等服务。",
             "downloadUrl": "https://dldir1.qq.com/qqfile/qq/QQNT/Windows/QQ_9.9.11_240606_x64_01.exe",
             "showIndex": 4
         },
@@ -103,7 +99,7 @@
             "type": "communication",
             "desc": "通信工具",
             "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaJ4eEV6EXOyQdQPBurvf_jgDut25V0XqpSg&s",
-            "info": "企业微信是一款由腾讯公司推出的即时通讯软件，支持Windows、Mac、Linux、Android、iOS等操作系统。",
+            "info": "企业微信，是腾讯微信团队为企业打造的通信与办公工具，具有与微信一致的沟通体验、丰富的OA应用及连接微信的能力，可帮助企业以连接为基础，实现智慧管理、智慧生态、智慧服务。",
             "downloadUrl": "https://dldir1.qq.com/wework/work_weixin/WeCom_4.1.27.8111.exe",
             "showIndex": 5
         },
@@ -112,7 +108,7 @@
             "type": "networking",
             "desc": "远程控制",
             "image": "https://www.todesk.com/dist/img/90fde7a.png",
-            "info": "toDesk是一款办公软件，支持Windows、Mac、Linux、Android、iOS等操作系统。",
+            "info": "ToDesk远程控制软件是一款稳定流畅的远程控制电脑手机连接软件,可远程桌面办公,远程协助运维.采用端对端加密,让每一次远程访问都安全可靠。",
             "downloadUrl": "https://dl.todesk.com/windows/ToDesk.exe",
             "showIndex": 6
         },
@@ -187,6 +183,222 @@
             "info": "Google Chrome是一款由Google开发的网页浏览器，由Google、Opera Software和Vivaldi等公司共同开发。Google Chrome是目前世界上使用最多的浏览器，它拥有超过1亿的用户，是全球最大的搜索引擎。",
             "downloadUrl": "https://dl.google.com/tag/s/appguid%3D%7B8A69D345-D564-463C-AFF1-A69D9E530F96%7D%26iid%3D%7B8D6028AA-B9D0-9FA6-7102-9260756C7CAE%7D%26lang%3Den%26browser%3D4%26usagestats%3D1%26appname%3DGoogle%2520Chrome%26needsadmin%3Dprefers%26ap%3Dx64-statsdef_1%26installdataindex%3Dempty/update2/installers/ChromeSetup.exe",
             "showIndex": 14
+        },
+        {
+            "name": "Firefox",
+            "type": "tool",
+            "desc": "火狐浏览器",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiVS1U-KvO3ZdpcTg9IQPsp-hoeMwDOzQI1Q&s",
+            "info": "Firefox是一款由Mozilla开发的网页浏览器，由Mozilla、Adobe、Google、Opera Software和Vivaldi等公司共同开发。Firefox是目前世界上使用最多的浏览器，它拥有超过1亿的用户，是全球最大的搜索引擎。",
+            "downloadUrl": "https://download-installer.cdn.mozilla.net/pub/firefox/releases/128.0/win32/en-US/Firefox%20Installer.exe",
+            "showIndex": 15
+        },
+        {
+            "name": "Opera",
+            "type": "tool",
+            "desc": "欧朋浏览器",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvrVCTI4ACokX_iTIz6q2pTyApiq8_HpoVpg&s",
+            "info": "Opera是由Opera软件基于Chromium架构所开发的网页浏览器，采全新模块化设计，内置广告阻挡器与VPN，特色功能包括工作区切换、标签页岛、快速拨号，集成式侧边栏中的音乐集成、社交媒体等各种集成，以及Opera Aria AI，可供Windows、macOS、Linux、Android与iOS系统使用。",
+            "downloadUrl": "https://net.geo.opera.com/opera/stable/windows?utm_source=google&utm_medium=ose&utm_campaign=%28none%29&http_referrer=https%3A%2F%2Fwww.google.com%2F&utm_site=opera_com&utm_lastpage=opera.com%2Fdownload&dl_token=12528081",
+            "showIndex": 16
+        },
+        {
+            "name": "Mozilla Thunderbird",
+            "type": "tool",
+            "desc": "火狐邮件客户端",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Thunderbird_2023_icon.svg/1200px-Thunderbird_2023_icon.svg.png",
+            "info": "Mozilla Thunderbird，非正式中文名称为雷鸟，是由Mozilla基金会研发的一款自由及开放源码的跨平台电邮客户端、新闻阅读器、聚合器以及即时通信软件。",
+            "downloadUrl": "https://download-installer.cdn.mozilla.net/pub/thunderbird/releases/128.0.1esr/win64/zh-CN/Thunderbird%20Setup%20128.0.1esr.exe",
+            "showIndex": 17
+        },
+        {
+            "name": "Mailbird",
+            "type": "tool",
+            "desc": "邮件客户端",
+            "image": "https://img.utdstc.com/icon/6d7/45e/6d745e4d43f0ececf4cb81b12621af58ce884b75a65b392602b3183644fd7e7e:200",
+            "info": "Mailbird是适用于Windows 7及其之后更高版本的桌面电子邮件客户端，可用于发送、接收电子邮件，同时管理来自Outlook、Gmail、雅虎邮箱等不同电子邮箱的日历事件及联系人。该客户端还涵盖社交媒体、任务管理、文件共享和视频会议集成等功能。",
+            "downloadUrl": "https://download.getmailbird.com/installers/MailbirdSetup.exe",
+            "showIndex": 18
+        },
+        {
+            "name": "Postbox",
+            "type": "tool",
+            "desc": "邮件客户端",
+            "image": "https://d1ctrvvfkbyl4b.cloudfront.net/blog/_1200x630_crop_center-center_82_none/postbox-logo@2x.png?mtime=1588603046",
+            "info": "Postbox是Windows和macOS的桌面电子邮件客户端，新闻客户端和供稿阅读器。",
+            "downloadUrl": "https://d3nx85trn0lqsg.cloudfront.net/win/postbox-7.0.61-win32.exe",
+            "showIndex": 19
+        },
+        {
+            "name": "WinRAR",
+            "type": "tool",
+            "desc": "压缩软件",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQE1GxEaoGr1ptVvfbo-PrQxa_PGc7sW_eWEA&s",
+            "info": "WinRAR是一款免费的压缩软件，支持多种格式的压缩和解压缩，支持多种操作系统，包括Windows、macOS、Linux、Android和iOS。",
+            "downloadUrl": "https://www.win-rar.com/fileadmin/winrar-versions/winrar/winrar-x64-701.exe",
+            "showIndex": 20
+        },
+        {
+            "name": "7-Zip",
+            "type": "tool",
+            "desc": "压缩软件",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/7-Zip_Icon.svg/1200px-7-Zip_Icon.svg.png",
+            "info": "7-Zip是一个开放源码的数据压缩程序，主要用在Microsoft Windows操作系统，Unix-like的操作系统如Linux与FreeBSD下面有7-zip的移植版本p7zip可以使用。它提供命令行接口的程序或图形用户界面的程序，而且可以与资源管理器结合。",
+            "downloadUrl": "https://www.7-zip.org/a/7z2407-x64.exe",
+            "showIndex": 21
+        },
+        {
+            "name": "BreeZip",
+            "type": "tool",
+            "desc": "压缩软件",
+            "image": "https://store-images.s-microsoft.com/image/apps.18485.14127971365609947.e2197859-e604-4047-ab0b-7f460808e4fb.abf096c3-b71a-4a66-9bd4-12e22f1445fa?h=307",
+            "info": "BreeZip是一款解压缩软件和压缩工具，它能快速地解压缩文件包和压缩各种类型文件，例如：Zip, RAR, 7-zip, 7z, Tar, Gzip......等几十种压缩包格式进行压缩文件解压，解压压缩速度比传统压缩软件快20%。它还能支持密码解压缩包和压缩解压包，是winrar, 7zip, 360压缩的最佳替代品。",
+            "downloadUrl": "https://apps.microsoft.com/detail/9pb13jl37zv4?cid=breezip_site&rtc=1&hl=zh-cn&gl=CN",
+            "showIndex": 22
+        },
+        {
+            "name": "Total Commander",
+            "type": "tool",
+            "desc": "文件管理器",
+            "image": "https://xbeta.info/tc/images/top.logo.gif",
+            "info": "文件管理工具，共享软件，适用于Windows® 95/98/ME/NT/2000/XP/Vista/7/8/8.1/10/11 和 Windows®3.1",
+            "downloadUrl": "https://totalcommander.ch/1103/tcmd1103x32_64.exe",
+            "showIndex": 23
+        },
+        {
+            "name": "FreeCommander",
+            "type": "tool",
+            "desc": "文件管理器",
+            "image": "https://images.sftcdn.net/images/t_app-icon-m/p/6be14790-99ea-11e6-bd80-00163ed833e7/541470300/freecommander-logo.jpg",
+            "info": "FreeCommander 是 Windows 标准元件档案总管的一个易于使用的替代品。该程序可以帮助您在Windows 中进行日常工作。你可以找到管理资料文件库存的所有必要功能。你可以随时随地使用FreeCommander - 只需将安装目录复制到CD或USB-Stick上即可。",
+            "downloadUrl": "https://freecommander.com/downloads/FreeCommanderXE-32-public_setup.zip",
+            "showIndex": 24
+        },
+        {
+            "name": "Directory Opus",
+            "type": "tool",
+            "desc": "文件管理器",
+            "image": "https://directory-opus.com/wp-content/uploads/2021/06/DOpus_400x400.png",
+            "info": "Directory Opus是一款免费的Windows文件管理器，它可以帮助您在Windows中管理文件和文件夹。它可以帮助您在Windows中管理文件和文件夹。它可以帮助您在Windows中管理文件和文件夹。",
+            "downloadUrl": "https://cdn.gpsoft.com.au/files/Opus13/DOpusInstall-13.7.exe",
+            "showIndex": 25
+        },
+        {
+            "name": "Everything",
+            "type": "tool",
+            "desc": "文件管理器",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXBvJVXhUqoXfiS547kR5ucji3yd2us-qeww&s",
+            "info": "Everything是一款免费的Windows文件管理器，它可以帮助您在Windows中管理文件和文件夹。它可以帮助您在Windows中管理文件和文件夹。",
+            "downloadUrl": "https://www.voidtools.com/Everything-1.4.1.1024.x64-Setup.exe",
+            "showIndex": 26
+        },
+        {
+            "name": "Kaspersky Anti-Virus",
+            "type": "security",
+            "desc": "杀毒软件",
+            "image": "https://d3kwb303vesg1m.cloudfront.net/se/com/content/en-global/images/dl2-2/product-icons/kav4win/kav4win.svg",
+            "info": "卡巴斯基反病毒软件是一款由来自于俄罗斯的卡巴斯基实验室研发的杀毒软件品牌，曾获得AV-Comparatives多年的年度最佳产品。",
+            "downloadUrl": "https://products.s.kaspersky-labs.com/homeuser/kav2021/21.3.10.391abcdefghijkl/multilanguage-0.2478.0/3837343934337c44454c7c31_25327/kav21.3.10.391abcdefghijklen_zh-Hant_25327.exe",
+            "showIndex": 27
+        },
+        {
+            "name": "Avira",
+            "type": "security",
+            "desc": "杀毒软件",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRufrKenSyepE22el3d7rgbhSwAMfNXZKqnw&s",
+            "info": "Avira Operations GmbH & Co. KG是一家德国计算机安全软件公司，该公司的产品有杀毒软件Avira Free Security。 Avira 成立于2006年。截至2021年, 该公司由美国软件公司诺顿LifeLock持有，此前由投资公司Investcorp持有。",
+            "downloadUrl": "https://package.avira.com/download/spotlight-windows-bootstrapper/avira_zh-cn_sptl1_1883878748-1721495497-1721495497-1__phpws.exe",
+            "showIndex": 28
+        },
+        {
+            "name": "Bitdefender",
+            "type": "security",
+            "desc": "杀毒软件",
+            "image": "https://pbs.twimg.com/profile_images/1606298880806735872/h8BEXcgK_400x400.png",
+            "info": "必特梵德是一款由罗马尼亚的Softwin软件公司开发的杀毒软件。 BitDefender诞生于2001年11月，代替了它之前的AVX系列产品。该产品包括有家庭版、商业版、企业版和服务器版。",
+            "downloadUrl": "https://download.bitdefender.com/windows/installer/en-us/bitdefender_avfree.exe",
+            "showIndex": 29
+        },
+        {
+            "name": "Avast",
+            "type": "security",
+            "desc": "杀毒软件",
+            "image": "https://images-eds-ssl.xboxlive.com/image?url=4rt9.lXDC4H_93laV1_eHHFT949fUipzkiFOBH3fAiZZUCdYojwUyX2aTonS1aIwMrx6NUIsHfUHSLzjGJFxxrw7KTZ6LMqBr3Xv4lqiZOCyAMtlmceAN8KEu2lk0RGplkLnoByWmvKq6oclvLUNH5z_6LPVJv.XiPUjvd5IcJk-&format=source",
+            "info": "Avast是位于捷克布拉格的AVAST Software a.s.于1988年首次发行的杀毒软件，软件名取自“Anti-Virus-Advanced-Set”，即“高级杀毒软件”。其中央扫描引擎成功通过了ICSA实验室认证以及西海岸实验室的测试过程，软件亦结合有反间谍软件功能、反Rootkit功能以及自我保护能力。",
+            "downloadUrl": "https://bits.avcdn.net/productfamily_ANTIVIRUS/insttype_FREE/platform_WIN/installertype_ONLINE/build_RELEASE/cookie_mmm_ava_003_999_a8g_m:dlid_FAV-ONLINE-HP?ref=clid_1506037374.1721495901--seid_1721495901--senu_1&alt=en-eu",
+            "showIndex": 30
+        },
+        {
+            "name": "ESET",
+            "type": "security",
+            "desc": "杀毒软件",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/ESET_logo.svg/1200px-ESET_logo.svg.png",
+            "info": "非常适合关注隐私的现代用户，他们积极使用互联网购物、银行、工作和交流。安全防护Windows、MacOS和Android设备",
+            "downloadUrl": "https://download.eset.com/com/eset/tools/installers/live_eis/latest/eset_internet_security_live_installer.exe",
+            "showIndex": 31
+        },
+        {
+            "name": "AVG",
+            "type": "security",
+            "desc": "杀毒软件",
+            "image": "https://i.pcmag.com/imagery/reviews/02iY8Irg4Ay6MzAFvDtGiLp-31.fit_lim.size_1050x591.v1685119376.jpg",
+            "info": "AVG 的恶意软件扫描程序采用机器学习、启发式分析及在线恶意软件数据库来识别新型和已知的恶意软件威胁，包括木马、蠕虫、rootkit、加密劫持器，等等。在测试中，它的恶意软件扫描程序表现不错，虽然智能扫描有一些不足，但深度扫描的恶意软件检测率高达 100%。",
+            "downloadUrl": "https://bits.avcdn.net/productfamily_ANTIVIRUS/insttype_FREE/platform_WIN_AVG/installertype_ONLINE/build_RELEASE/cookie_mmm_bav_003_999_a8g_m:dlid_FREEGSR-FAD?ref=clid_304637313.1721496395--seid_1721496394--senu_1&alt=en-us",
+            "showIndex": 32
+        },
+        {
+            "name": "Norton AntiVirus",
+            "type": "security",
+            "desc": "杀毒软件",
+            "image": "https://www.malwarebytes.com/wp-content/uploads/sites/2/2023/11/Malwarebytes-logo.png",
+            "downloadUrl": "https://www.malwarebytes.com/api/downloads/mb-windows?filename=MBSetup.exe",
+            "info": "Malwarebytes Anti-Malware（恶意软件字节公司，简称MBAM）是一款可侦测并移除恶意软件、勒索软件、漏洞利用的应用程序。它是由malwarebytes公司于2008年1月释出初版。它有免费版和付费版。前者需手动执行扫描，可侦测并移除恶意软件；后者比起前者多了排程扫描、即时防护、快闪存储器扫描等功能。自第1.75版起，MBAM新增扫描压缩档内档案的能力。",
+            "showIndex": 33
+        },
+        {
+            "name": "VLC Media Player",
+            "type": "media",
+            "desc": "媒体播放器",
+            "image": "https://images.dwncdn.net/images/t_app-icon-l/p/4f747dcf-cb34-4eb9-8a70-00402c1aa0e4/3073156748/13632_4-75761094-imgingest-6755342896591978142.png",
+            "info": "VLC多媒体播放器，最初名为VideoLAN Client，是VideoLAN计划的开放源代码多媒体播放器。支持众多音频与视频解码器及文件格式，并支持DVD影音光盘、VCD影音光盘及各类流协议。它也能作为单播或多播的流服务器在IPv4或IPv6的高速网络连线下使用。",
+            "downloadUrl": "https://get.videolan.org/vlc/3.0.21/win32/vlc-3.0.21-win32.exe",
+            "showIndex": 34
+        },
+        {
+            "name": "PotPlayer",
+            "type": "media",
+            "desc": "媒体播放器",
+            "image": "https://images.sftcdn.net/images/t_app-icon-m/p/d3c12354-96d3-11e6-bfbf-00163ed833e7/1418749125/potplayer-PotPlayer_logo_(2017).png",
+            "info": "PotPlayer，是The KMPlayer的原作者姜勇囍进入Daum公司后的新一代作品，目前仍有更新。由于采用Delphi编译程序的KMPlayer有一些弊端，姜勇囍为改进播放器本身的一些性能而重新用VC++进行构架。",
+            "downloadUrl": "https://t1.daumcdn.net/potplayer/PotPlayer/Version/Latest/PotPlayerSetup64.exe",
+            "showIndex": 35
+        },
+        {
+            "name": "KMPlayer",
+            "type": "media",
+            "desc": "媒体播放器",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/3/34/KMPlayer_Icon_2.png",
+            "info": "The KMPlayer，简称KMP，是韩国作者姜勇囍所开发的免费影音播放软件。早期名叫“WaSaVi”播放器，历时五年自主开发的韩文多媒体图形视窗工程免费项目。目前以其强大的操控功能在众多免费播放器中逐渐显示其开发实力。 ",
+            "downloadUrl": "https://dn.kmplayer.com/Dn/kmp64x/KMP64_2024.6.25.17.exe",
+            "showIndex": 36
+        },
+        {
+            "name": "Adobe Photoshop",
+            "type": "design",
+            "desc": "图像处理软件",
+            "image": "https://www.adobe.com/content/dam/acom/en/devnet/photoshop/pdfs/photoshop-cc-2019-pdf.pdf",
+            "info": "Adobe图像处理软件 Photoshop 2024 正式版 (25.9.1) 2024年6月更新版.Adobe Photoshop 2024破解版(简称PS)是一款全球流行的专业图像处理软件及照片和设计软件.Adobe Photoshop中文破解版是Adobe Creative Cloud 创意云桌面程序中心的图形设计软件热门产品,它是平面设计领域和数字图象处理行业标准.",
+            "downloadUrl": "magnet:?xt=urn:btih:9f462339b0723f21f4e74dc325e3efc8340a2bdb&dn=Photoshop.2024",
+            "showIndex": 37
+        },
+        {
+            "name": "Visual Studio",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Visual_Studio_2017_Logo.svg/480px-Visual_Studio_2017_Logo.svg.png",
+            "info": "Microsoft Visual Studio是微软公司的开发工具包系列产品。VS是一个基本完整的开发工具集，它包括了整个软件生命周期中所需要的大部分工具，如UML工具、代码管控工具、集成开发环境等等。",
+            "downloadUrl": "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030:bb272c84296649068e10efe30eade914",
+            "showIndex": 38
         }
     ]
 }
