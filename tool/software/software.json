@@ -250,9 +250,9 @@
         },
         {
             "name": "Total Commander",
-            "type": "tool",
+            "type": "tool, development",
             "desc": "文件管理器",
-            "image": "https://xbeta.info/tc/images/top.logo.gif",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxgxpM_wCnjxFXpwd9bTYfvbEsRQ3HdBrgMA&s",
             "info": "文件管理工具，共享软件，适用于Windows® 95/98/ME/NT/2000/XP/Vista/7/8/8.1/10/11 和 Windows®3.1",
             "downloadUrl": "https://totalcommander.ch/1103/tcmd1103x32_64.exe",
             "showIndex": 23

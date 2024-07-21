@@ -1,0 +1,81 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+.card {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    padding: 20px 40px;
+    max-width: 500px;
+    width: 100%;
+}
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: red; /* 改为红色 */
+}
+.header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: red;
+}
+.instructions {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #555;
+}
+.input-group {
+    margin-bottom: 15px;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.input-group textarea {
+    resize: none; /* 禁止调整大小 */
+    height: 180px; /* 设置高度大约显示10行文字 */
+}
+.button-group {
+    display: flex;
+    justify-content: center; /* 居中对齐 */
+    margin-top: 20px;
+}
+.button {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.button.cancel {
+    background-color: #6c757d;
+}
+.button:hover {
+    background-color: #0056b3;
+}
+.button.cancel:hover {
+    background-color: #5a6268;
+}

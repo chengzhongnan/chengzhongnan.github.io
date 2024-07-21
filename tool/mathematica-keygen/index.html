@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematica Activation</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="keygen.js" type="module"></script>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>WOLFRAM MATHEMATICA</h1>
+            <h2>手动激活 密钥生成工具</h2>
+        </div>
+        <div class="instructions">
+            <p>第一步：你需要进入到Mathematica的手动激活界面，找到你机器产生的 Math ID。</p>
+            <p>第二步：请在下面输入你的Math ID和激活密钥（可以采用默认或者随机生成同样格式的文本），然后点击生成密码按钮。</p>
+            <p>第三步：在你的Mathematica的手动激活界面，输入激活密钥和密码框中的某一行密码，点击激活按钮（如果无效，可以换一个其他密码重试）。</p>
+        </div>
+        <div class="input-group">
+            <label for="math-id">Math ID</label>
+            <input type="text" id="math-id" placeholder="XXXX-XXXXX-XXXXX">
+        </div>
+        <div class="input-group">
+            <label for="activation-key">激活密钥</label>
+            <input type="text" id="activation-key" placeholder="1234-4321-123456">
+        </div>
+        <div class="button-group">
+            <button class="button" id="create">生成密码</button>
+        </div>
+        <div class="input-group">
+            <label for="password">密码</label>
+            <textarea id="password" readonly></textarea>
+        </div>
+    </div>
+    <script src="script.js" type="module"></script>
+</body>
+</html>
