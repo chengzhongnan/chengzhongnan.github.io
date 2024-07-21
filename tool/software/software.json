@@ -45,16 +45,8 @@
             "name": "开发工具"
         },
         {
-            "type": "finance",
-            "name": "财务软件"
-        },
-        {
-            "type": "health",
-            "name": "健康软件"
-        },
-        {
-            "type": "lifestyle",
-            "name": "生活软件"
+            "type": "crack",
+            "name": "破解软件"
         }
     ],
     "softwares": [
@@ -386,7 +378,7 @@
             "name": "Adobe Photoshop",
             "type": "design",
             "desc": "图像处理软件",
-            "image": "https://www.adobe.com/content/dam/acom/en/devnet/photoshop/pdfs/photoshop-cc-2019-pdf.pdf",
+            "image": "https://www.adobe.com/content/dam/acom/one-console/icons_rebrand/ps_appicon.svg",
             "info": "Adobe图像处理软件 Photoshop 2024 正式版 (25.9.1) 2024年6月更新版.Adobe Photoshop 2024破解版(简称PS)是一款全球流行的专业图像处理软件及照片和设计软件.Adobe Photoshop中文破解版是Adobe Creative Cloud 创意云桌面程序中心的图形设计软件热门产品,它是平面设计领域和数字图象处理行业标准.",
             "downloadUrl": "magnet:?xt=urn:btih:9f462339b0723f21f4e74dc325e3efc8340a2bdb&dn=Photoshop.2024",
             "showIndex": 37
@@ -399,6 +391,213 @@
             "info": "Microsoft Visual Studio是微软公司的开发工具包系列产品。VS是一个基本完整的开发工具集，它包括了整个软件生命周期中所需要的大部分工具，如UML工具、代码管控工具、集成开发环境等等。",
             "downloadUrl": "https://c2rsetup.officeapps.live.com/c2r/downloadVS.aspx?sku=enterprise&channel=Release&version=VS2022&source=VSLandingPage&cid=2030:bb272c84296649068e10efe30eade914",
             "showIndex": 38
+        },
+        {
+            "name": "Visual Studio Code",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://cdn.worldvectorlogo.com/logos/visual-studio-code-1.svg",
+            "info": "Visual Studio Code是一款由微软开发且跨平台的免费源代码编辑器。该软件以扩展的方式支持语法高亮、代码自动补全、代码重构功能，并且内置了命令行工具和Git 版本控制系统。用户可以更改主题和键盘快捷方式实现个性化设置，也可以通过内置的扩展程序商店安装其他扩展以拓展软件功能。 ",
+            "downloadUrl": "https://vscode.download.prss.microsoft.com/dbazure/download/stable/f1e16e1e6214d7c44d078b1f0607b2388f29d729/VSCodeUserSetup-x64-1.91.1.exe",
+            "showIndex": 39
+        },
+        {
+            "name": "Eclipse",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStMJegPaJ3e85xCxO2e7bRq7kH_S--LyAVkw&s",
+            "info": "Eclipse是一款跨平台开源集成开发环境。最初主要用来Java语言开发，目前亦有人通过插件使其作为C++、Python、PHP等其他语言的开发工具。 Eclipse的本身只是一个框架平台，但是众多插件的支持，使得Eclipse拥有较佳的灵活性，所以许多软件开发商以Eclipse为框架开发自己的IDE。",
+            "downloadUrl": "https://www.eclipse.org/downloads/download.php?file=/oomph/epp/2024-06/R/eclipse-inst-jre-win64.exe",
+            "showIndex": 40
+        },
+        {
+            "name": "PyCharm",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpA5dio5I4wjBJ-gcMuxe1aSUsyWdMXl0w1Q&s",
+            "info": "PyCharm是一个用于计算机编程的集成开发环境，主要用于Python语言开发，由捷克公司JetBrains开发，拥有Microsoft Windows、macOS和Linux版本。社区版在Apache许可证下发布，提供代码分析、图形化调试器，集成测试器、集成版本控制系统，并支持使用Django进行网页开发。",
+            "downloadUrl": "https://download.jetbrains.com/python/pycharm-professional-2024.1.4.exe",
+            "showIndex": 41
+        },
+        {
+            "name": "IntelliJ IDEA",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZHQE89O5n7JuJZLQE3MCBysxZx3Y-JMiSGQ&s",
+            "info": "IntelliJ IDEA是一种商业化销售的Java集成开发环境工具软件，由JetBrains软件公司开发，提供Apache 2.0开放式授权的社区版本以及专有软件的商业版本，开发者可选择其所需来下载使用。",
+            "downloadUrl": "https://download.jetbrains.com/idea/ideaIU-2024.1.4.exe",
+            "showIndex": 42
+        },
+        {
+            "name": "Atom",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3x5RGFiS8nGTYomPAecO52S2lgKfO4oViPg&s",
+            "info": "Atom是由GitHub开发的自由及开放源代码的文字与代码编辑器，支持macOS、Windows和Linux操作系统，支持Node.js所写的插件，并内置由Github提供的Git版本控制系统。多数的延伸包皆为开放源代码许可，并由社群建置与维护。",
+            "downloadUrl": "https://github.com/atom/atom/releases/download/v1.60.0/AtomSetup-x64.exe",
+            "showIndex": 43
+        },
+        {
+            "name": "Sublime Text",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFUSeYjh36g_S82-Tsg9W96EF0zabjckKaVw&s",
+            "info": "Sublime Text是一套跨平台的文本编辑器，支持基于Python的插件。Sublime Text是专有软件，可透过包扩展。大多数的包使用自由软件授权发布，并由社群建置维护。",
+            "downloadUrl": "https://download.sublimetext.com/sublime_text_build_4169_x64_setup.exe",
+            "showIndex": 44
+        },
+        {
+            "name": "Notepad++",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Notepad%2B%2B_Logo.svg/512px-Notepad%2B%2B_Logo.svg.png",
+            "info": "Notepad++是自由软件的纯文本编辑器，由台湾人侯今吾基于同是开放源代码的Scintilla文本编辑组件并独力研发，整项项目起初托管于SourceForge.net，截至2011年已下载超过2700万次，并两度获得SourceForge社群选择奖——最佳开发工具。",
+            "downloadUrl": "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.4/npp.8.6.4.Installer.x64.exe",
+            "showIndex": 45
+        },
+        {
+            "name": "Android Studio",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://developer.android.com/static/images/logos/android.svg",
+            "info": "Android Studio是一个为Android平台开发程序的集成开发环境。2013年5月16日在Google I/O上发布，可供开发者免费使用。 2013年5月发布早期预览版本，版本号为0.1。2014年6月发布0.8版本，至此进入beta阶段。第一个稳定版本1.0于2014年12月8日发布。",
+            "downloadUrl": "https://redirector.gvt1.com/edgedl/android/studio/install/2024.1.1.12/android-studio-2024.1.1.12-windows.exe",
+            "showIndex": 46
+        },
+        {
+            "name": "Git",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQlNcQUZyQR5rJ4gHKUUuvWw_68oqmXdz89w&s",
+            "info": "git是一个分布式版本控制软件，最初由林纳斯·托瓦兹创作，于2005年以GPL许可协议发布。最初目的是为了更好地管理Linux内核开发而设计。应注意的是，这与GNU Interactive Tools不同。 git最初的开发动力来自于BitKeeper和Monotone。",
+            "downloadUrl": "https://github.com/git-for-windows/git/releases/download/v2.45.2.windows.1/Git-2.45.2-64-bit.exe",
+            "showIndex": 47
+        },
+        {
+            "name": "SourceTree",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRglTrI-WTh1RjtgJ83GqH8KDvdB2aRgzmR0A&s",
+            "info": "告别命令行- 通过Git 客户端简化分发版本的控制，快速为每个人提供最新信息。非常适合用于提高高级用户的工作效率。查看分支之间的变更集、stash、cherry-pick 等等。",
+            "downloadUrl": "https://product-downloads.atlassian.com/software/sourcetree/windows/ga/SourceTreeSetup-3.4.18.exe",
+            "showIndex": 48
+        },
+        {
+            "name": "Github Desktop",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTV0TtaTbg9dT7tqx_qxhQFC4ul9meZdIW9MQ&s",
+            "info": "专注于重要的事情，而不是与 Git 抗争。无论你是 Git 新手还是资深用户，GitHub Desktop 都能简化你的开发工作流程。",
+            "downloadUrl": "https://desktop.githubusercontent.com/github-desktop/releases/3.4.2-27793d93/GitHubDesktopSetup-x64.exe",
+            "showIndex": 49
+        },
+        {
+            "name": "TortoiseGit",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJWTqE_zJzI4mg1XVpI7L8v-hJwALpJieJMQ&s",
+            "info": "TortoiseGit是一个Git版本控制客户端，作为Microsoft Windows的外壳扩展实现。它在GNU通用公共许可协议下作为自由软件发布。",
+            "downloadUrl": "https://download.tortoisegit.org/tgit/2.16.0.0/TortoiseGit-2.16.0.0-64bit.msi",
+            "showIndex": 50
+        },
+        {
+            "name": "TortoiseSVN",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://a.fsdn.com/allura/p/tortoisesvn/icon?1690577411?&w=135",
+            "info": "TortoiseSVN是一个Windows平台下的Subversion用户端软件，以Windows shell extension的方式写成。它是自由软件，以GNU通用公共许可证发布。",
+            "downloadUrl": "https://deac-riga.dl.sourceforge.net/project/tortoisesvn/1.14.7/Application/TortoiseSVN-1.14.7.29687-x64-svn-1.14.3.msi?viasf=1",
+            "showIndex": 51
+        },
+        {
+            "name": "nodejs",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://miro.medium.com/v2/resize:fit:800/1*bc9pmTiyKR0WNPka2w3e0Q.png",
+            "info": "Node.js 是跨平台、开源的 JavaScript 运行环境，可在Windows、Linux、macOS 等操作系统上运行。Node.js 由 OpenJS Foundation 持有和维护，亦为Linux 基金会的项目。",
+            "downloadUrl": "https://nodejs.org/dist/v22.5.1/node-v22.5.1-win-x64.zip",
+            "showIndex": 52
+        },
+        {
+            "name": "python",
+            "desc": "开发工具",
+            "type": "development",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBJBwDlNrMq5Wj_l-vGaNPgVONr-Zvoh_kZQ&s",
+            "info": "Python，是一种广泛使用的解释型、高级和通用的编程语言。Python支持多种编程范型，包括结构化、过程式、反射式、面向对象和函数式编程。它拥有动态类型系统和垃圾回收功能，能够自动管理内存使用，并且其本身拥有一个巨大而广泛的标准库。",
+            "downloadUrl": "https://www.python.org/ftp/python/3.12.4/python-3.12.4-amd64.exe",
+            "showIndex": 53
+        },
+        {
+            "name": "java",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzKVrVcrrTL7A8B75qwwrpkAx3uOewEt9RbA&s",
+            "info": "Java是一种广泛使用的计算机编程语言，拥有跨平台、面向对象、泛型编程的特性，广泛应用于企业级Web应用开发和移动应用开发。",
+            "downloadUrl": "https://download.oracle.com/java/22/latest/jdk-22_windows-x64_bin.exe",
+            "showIndex": 54
+        },
+        {
+            "name": "golang",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTa356WJ3XlfSLxGJh-o_yQysTlFrhBB6qGUQ&s",
+            "info": "Go是Google开发的一种静态强类型、编译型、并发型，并具有垃圾回收功能的编程语言。 罗伯特·格瑞史莫、罗勃·派克及肯·汤普逊于2007年9月开始设计Go，稍后伊恩·兰斯·泰勒、拉斯·考克斯加入项目。Go是基于Inferno操作系统所开发的。",
+            "downloadUrl": "https://go.dev/dl/go1.22.5.windows-amd64.msi",
+            "showIndex": 55
+        },
+        {
+            "name": "rust",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Rust_programming_language_black_logo.svg/1200px-Rust_programming_language_black_logo.svg.png",
+            "info": "Rust是由Mozilla主导开发的通用、编译型编程语言。设计准则为“安全、并发、实用”，支持函数式、并发式、过程式以及面向对象的编程风格。 Rust语言原本是Mozilla员工Graydon Hoare的个人项目，而Mozilla于2009年开始赞助这个项目，并且在2010年首次公开。",
+            "downloadUrl": "https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe",
+            "showIndex": 56
+        },
+        {
+            "name": "Navicat 17",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://navicat.com/images/02.Product_00_AllProducts_Premium16.svg",
+            "info": "Navicat 是香港卓软数字科技有限公司生产的一系列MySQL、Redis、PostgreSQL、Microsoft SQL Server、Oracle、MariaDB、SQLite 及 MongoDB 的图形化数据库管理及发展软件。它有一个类似浏览器的图形用户界面，支持多重连线到本地和远程数据库。",
+            "downloadUrl": "https://navicat.com/download/direct-download?product=navicat170_premium_en_x64.exe",
+            "showIndex": 57
+        },
+        {
+            "name": "nosqlbooster4mongo",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS36A3i08zqNqOvElJXFUTUMKO8FqoVhvkX7A&s",
+            "info": "NoSQLBooster 是一个适用于 MongoDB 服务器 3.6-8.0 的跨平台图形用户界面工具，提供内置的 MongoDB 脚本调试器、全面的服务器监控工具、链式流查询、SQL 查询、查询代码生成器、任务调度和高级智能感知体验。",
+            "downloadUrl": "https://s3.nosqlbooster.com/download/releasesv9/nosqlbooster4mongo-9.0.0.exe",
+            "showIndex": 58
+        },
+        {
+            "name": "Another Redis Desktop Manager",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://camo.githubusercontent.com/9e1d0c9436c54b55cfda142f93e01e52580fcaaaa465fc3a4d03c0f52f951289/68747470733a2f2f63646e2e6a7364656c6976722e6e65742f67682f7169736869626f2f696d672f616e6f2d7371756172652d69636f6e2d3132382e706e67",
+            "info": "更快、更好、更稳定的Redis桌面(GUI)管理客户端，兼容Windows、Mac、Linux，性能出众，轻松加载海量键值",
+            "downloadUrl": "https://github.com/qishibo/AnotherRedisDesktopManager/releases/download/v1.6.6/Another-Redis-Desktop-Manager.1.6.6.exe",
+            "showIndex": 59
+        },
+        {
+            "name": "DB Browser for SQLite",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://sqlitebrowser.org/images/sqlitebrowser.svg",
+            "info": "DB Browser for SQLite (DB4S) 是一个高质量、可视化的开源工具，专为那些想要创建、搜索和编辑 SQLite 数据库文件的人设计。DB4S 提供了一个类似电子表格的熟悉界面，并且提供了完整的 SQL 查询功能。它可以在 Windows、macOS 以及大多数版本的 Linux 和 Unix 上运行。",
+            "downloadUrl": "https://download.sqlitebrowser.org/DB.Browser.for.SQLite-3.12.2-win64.msi",
+            "showIndex": 60
+        },
+        {
+            "name": "DBeaver",
+            "type": "development",
+            "desc": "开发工具",
+            "image": "https://dbeaver.io/wp-content/uploads/2015/09/beaver-head.png",
+            "info": "DBeaver是一个SQL客户端和数据库管理工具。对于关系数据库，它使用JDBC API通过JDBC驱动程序与数据库交互。对于其他数据库，它使用专有数据库驱动程序。它提供了一个编辑器，支持代码完成和语法高亮。它提供了一种插件体系结构，允许用户修改应用程序的大部分行为，以提供与数据库无关的针对数据库的功能或特性。",
+            "downloadUrl": "https://dbeaver.io/files/dbeaver-ce-latest-x86_64-setup.exe",
+            "showIndex": 61
         }
     ]
 }
