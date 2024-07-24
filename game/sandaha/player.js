@@ -1,14 +1,18 @@
 import readline from 'readline';
-import { BiddingAi } from './gameAi.js';
+import { BiddingAi, ChooseTrumpSuitAi } from './gameAi.js';
+import { Suits } from './poker.js';
+import { SanDaHaCard } from './sandaha.js';
+import { getRandomIntegers } from './units.js'
 
 export class Player {
-    constructor(name, index) {
+    constructor(name, index, game) {
         this.name = name;
         this.hand = [];
         this.trumpSuit = null;
         this.friends = [];
         this.index = index;
         this.isUser = false;
+        this.game = game;
     }
 
     // 接收发牌
@@ -23,13 +27,55 @@ export class Player {
     }
 
     // 选择主牌花色
-    chooseTrumpSuit(suit, onChooseTrumpSuitCallback) {
-        this.trumpSuit = suit;
-        onChooseTrumpSuitCallback(this.name, this.trumpSuit);
+    async chooseTrumpSuit() {
+        if (this.isUser) {
+            return await this.chooseTrumpSuitUser(); 
+        } else {
+            return this.chooseTrumpSuitRobot();
+        }
     }
 
-    onOtherChooseTrumpSuit(playerName, suit) {
+    async chooseTrumpSuitUser() {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        const question = (text) => {
+            return new Promise((resolve) => {
+                rl.question(text, resolve);
+            });
+        };
+
+        const suitValues = [1, 2, 3, 4, 5];
+
+        const suitEnums = [Suits.SPADES, Suits.HEARTS, Suits.DIAMONDS, Suits.CLUBS, Suits.NO_TRUMP]
+        let userSuit = 0;
+        while (true) {
+            if (Player.isDebugMode()) {
+                userSuit = 1;
+            } else {
+                userSuit = await question('请输入你选择的花色序号: [1]♠ [2]♥ [3]♦ [4]♣ [5]无\n');
+            }
+
+            userSuit = parseInt(userSuit, 10);
+            if (suitValues.includes(userSuit)) {
+                rl.close();
+                return suitEnums[userSuit - 1];
+            }
+
+            console.log('无效分数，请重新输入：');
+        }
+    }
+
+    chooseTrumpSuitRobot() {
+        let ai = new ChooseTrumpSuitAi(this.hand);
+        return ai.chooseTrumpSuit();
+    }
+
+    onChangeTrumpSuit(suit) {
         this.trumpSuit = suit;
+        console.log(`当前选择花色${suit}`);
     }
 
     addFriend(player) {
@@ -88,6 +134,10 @@ export class Player {
         }
     }
 
+    static isDebugMode() {
+        return true;
+    }
+
     async promptBidUser(currentScore) {
         const bidValues = [];
         for (let i = 5; i < currentScore; i += 5) {
@@ -111,7 +161,12 @@ export class Player {
 
         let userBid;
         while (true) {
-            userBid = await question('请输入你选择的分数: ');
+            if (Player.isDebugMode()) {
+                userBid = 'pass';
+            } else {
+                userBid = await question('请输入你选择的分数: ');
+            }
+            
             if (userBid === 'pass') {
                 rl.close();
                 return 'pass';
@@ -130,5 +185,45 @@ export class Player {
     promptBidRobot(currentScore) {
         let ai = new BiddingAi(this.hand);
         return ai.promptBidRobot(currentScore);
+    }
+
+    async pressBottomCards() {
+
+    }
+
+    /**
+     * 查看某张牌是否成对子
+     * @param {SanDaHaCard} card 
+     * @param {*} options 
+     */
+    isUnpaired(card, options) {
+        let count = 0;
+        this.hand.forEach((c) => { 
+            if (c.isPairWith(card)) count++;
+        })
+
+        return count < 2;
+    }
+
+    // 找到手牌中没有成对子的牌
+    findUnpairedCard(count, options = null) {
+        let unpairedCards = [];
+        for (let card of this.hand) {
+            if (this.isUnpaired(card, options)) {
+                unpairedCards.push(card);
+            }
+        }
+
+        if (unpairedCards.length <= count) {
+            return unpairedCards;
+        }
+
+        let randomIndexs = getRandomIntegers(unpairedCards.length, count);
+        let cards = [];
+        for (let index of randomIndexs) {
+            cards.push(unpairedCards[index]);
+        }
+
+        return cards;
     }
 }

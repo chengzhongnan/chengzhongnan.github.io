@@ -3,9 +3,11 @@ import { SanDaHaDeck } from './sandaha.js';
 import { Player } from './player.js';
 import characters from './playernames.js';
 import { Suits } from './poker.js';
+import EventEmitter from './eventemitter3.js'
 
-class Game {
+class Game extends EventEmitter {
     constructor() {
+        super();
         this.deck = new SanDaHaDeck();
         this.players = [];
         this.trumpSuit = null; // 主牌花色
@@ -26,7 +28,7 @@ class Game {
     createPlayers() {
         const names = Game.getRandomUniqueValues(characters, 4);
         for (let i = 1; i <= 4; i++) {
-            const player = new Player(names[i-1], i);
+            const player = new Player(names[i-1], i, this);
             this.players.push(player);
         }
 
@@ -34,7 +36,17 @@ class Game {
         const randomIndex = Math.floor(Math.random() * 4);
         this.players[randomIndex].setUser(true);
         console.log(`你获得的角色是 ${this.players[randomIndex].name}，你的拿牌顺序是 ${randomIndex}`);
+
+        // 监听事件
+        this.startListening();
+
         return this.players[randomIndex];
+    }
+
+    startListening() {
+        for (let p of this.players) {
+            this.on('changeTrumpSuit', p.onChangeTrumpSuit.bind(p));
+        }
     }
 
     /**
@@ -96,16 +108,21 @@ class Game {
             for (let i = 0; i < 21; i++) {
                 for (let j = 0; j < 4; j++) {
                     if (i > 0 && Math.random() < p) {
-                        // 前面牌的对子
-                        const randomIndex = Math.floor(Math.random() * this.players[j].hand.length);
-                        const previousCard =  this.players[j].hand[randomIndex];
-                        const pairCardIndex = remainingCards.findIndex(
-                            card => card.isPairWith(previousCard)
-                        );
-                        if (pairCardIndex > -1) {
-                            this.players[j].receiveCards(remainingCards.splice(pairCardIndex, 1)[0]);
+                        // 前面手牌中不成对子的牌
+                        const previousCards =  this.players[j].findUnpairedCard(1);
+                        if (previousCards.length > 0) {
+                            const previousCard = previousCards[0];
+                            const pairCardIndex = remainingCards.findIndex(
+                                card => card.isPairWith(previousCard)
+                            );
+                            if (pairCardIndex > -1) {
+                                this.players[j].receiveCards(remainingCards.splice(pairCardIndex, 1)[0]);
+                            } else {
+                                this.players[j].receiveCards(remainingCards.pop());
+                            }
                         } else {
-                            this.players[j].receiveCards(remainingCards.pop());
+                            // 随机发牌
+                            this.players[j].receiveCards(remainingCards.pop());    
                         }
                     } else {
                         // 随机发牌
@@ -124,9 +141,7 @@ class Game {
         this.trumpSuit = suit;
         this.deck.setTrumpSuit(suit);
 
-        for (let p of this.players) {
-            p.setTrumpSuit(suit);
-        }
+        this.emit('changeTrumpSuit', suit);
     }
 
      // 开始叫分
@@ -151,7 +166,7 @@ class Game {
                     playersStatus[currentPlayerIndex] = false;
                 } else if (bid === 5) {
                     // Call score 5, end bidding immediately
-                    this.endBidding(player);
+                    await this.endBidding(player);
                     return;
                 } else if (this.biddingScores.includes(bid) && bid < currentScore) {
                     // Valid bid
@@ -160,7 +175,7 @@ class Game {
                     currentPlayerIndex = (currentPlayerIndex + 1) % 4;
                     if (Object.keys(calledScores).length >= 1 && playersStatus.filter(status => status).length === 1) {
                         // Only one player is left to call
-                        this.endBidding(this.players.find((_, i) => playersStatus[i]));
+                        await this.endBidding(this.players.find((_, i) => playersStatus[i]));
                         return;
                     }
                 } else {
@@ -178,7 +193,12 @@ class Game {
         }
     }
 
-    // 提示玩家叫分
+    /**
+     * 提示玩家叫分
+     * @param {Player} player 
+     * @param {number} currentScore 
+     * @returns 
+     */
     async promptBid(player, currentScore) {
         // Simulate player's action (In real scenarios, you would get this from user input)
         // Here we just return a simulated bid for demonstration purposes
@@ -186,7 +206,7 @@ class Game {
     }
 
     // 结束叫分
-    endBidding(winner) {
+    async endBidding(winner) {
         console.log(`叫分结束，玩家【${winner.name}】是庄家，获得了底牌.`);
         this.dealer = winner;
         this.teams = this.players.filter(player => player !== winner);
@@ -198,16 +218,23 @@ class Game {
 
         // 展示玩家手牌
         winner.showHand();
+
+        await this.determineTrumpAndBottom(this.dealer);
     }
 
-    // 确定主牌花色和底牌
-    determineTrumpAndBottom() {
-        const dealer = this.players[this.dealerIndex];
-        this.trumpSuit = dealer.chooseTrumpSuit();
-        console.log(`${dealer.name} chooses ${this.trumpSuit} as trump suit.`);
+    /**
+     * 确定主牌花色和底牌
+     * @param {Player} dealer 
+     */
+    async determineTrumpAndBottom(dealer) {
+        const trumpSuit = await dealer.chooseTrumpSuit();
 
-        // 庄家拿底牌
-        dealer.receiveBottomCards(this.deck.cards);
+        this.setTrumpSuit(trumpSuit);
+
+        console.log(`${dealer.name} 选择 ${this.trumpSuit} 为主牌.`);
+
+        // 庄家压底牌
+        await dealer.pressBottomCards();
     }
 
     // 游戏主流程
@@ -240,7 +267,7 @@ game.shuffle();
 // 默认设置无主
 game.setTrumpSuit(Suits.NO_TRUMP);
 // 发牌
-const bottomCards = game.dealGoodCards(0.7);
+const bottomCards = game.dealGoodCards(0.6);
 
 // for (let p of game.players) {
 //     p.showHand();
