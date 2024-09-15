@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Circle and Polygon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #canvasContainer {
+            border: 1px solid #000;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<h2>绘制圆和内接正N边形</h2>
+
+<label for="radiusInput">圆的半径:</label>
+<input type="number" id="radiusInput" value="100" min="10"><br><br>
+
+<label for="sidesInput">N边形的边数N:</label>
+<input type="number" id="sidesInput" value="5" min="3"><br><br>
+
+<label for="circleColor">选择圆的颜色:</label>
+<input type="color" id="circleColor" value="#ff0000"><br><br>
+
+<label for="polygonColor">选择N边形的颜色:</label>
+<input type="color" id="polygonColor" value="#0000ff"><br><br>
+
+<button onclick="draw()">绘制</button><br><br>
+
+<div id="canvasContainer">
+    <canvas id="drawCanvas" width="500" height="500"></canvas>
+</div>
+
+<script>
+    function draw() {
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 清除画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const radius = parseFloat(document.getElementById('radiusInput').value);
+        const sides = parseInt(document.getElementById('sidesInput').value);
+        const circleColor = document.getElementById('circleColor').value;
+        const polygonColor = document.getElementById('polygonColor').value;
+
+        // 获取画布中心
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // 绘制圆
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.fillStyle = circleColor;
+        ctx.fill();
+        ctx.closePath();
+
+        // 绘制内接正N边形
+        ctx.beginPath();
+        for (let i = 0; i < sides; i++) {
+            const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+        ctx.fillStyle = polygonColor;
+        ctx.fill();
+    }
+</script>
+
+</body>
+</html>
