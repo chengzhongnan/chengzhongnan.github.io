@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魔方</title>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.min.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="./index.css" />
+</head>
+
+<body>
+
+    <div id="info">
+        <p><strong>3D 魔方操作说明</strong></p>
+        <p><strong>旋转视角：</strong>直接在任意位置按住鼠标左键并且拖拽。</p>
+        <p><strong>转动方块：</strong><span id="info_mode">按住 Ctrl 键</span>，然后在方块上拖拽鼠标。</p>
+    </div>
+
+    <div id="controls-container">
+        <button id="scramble-btn">打乱 (Scramble)</button>
+        <button id="reset-btn">还原 (Reset)</button>
+        <button id="undo-btn">回退 (Undo)</button>
+    </div>
+
+    <div id="log-container"></div>
+
+    <script type="module" src="./cubie.js"></script>
+</body>
+
+</html>
