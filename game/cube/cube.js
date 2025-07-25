@@ -24,7 +24,7 @@ let activeGroup = [];
 // --- 打乱/还原/回退/复制 ---
 let isScrambling = false;
 let isSolving = false;
-let initBtn, scrambleBtn, resetBtn, undoBtn, solveBtn, copyBtn;
+let initBtn, scrambleBtn, resetBtn, undoBtn, solveBtn, copyBtn, modeToggle;
 let moveHistory = [];
 
 // --- 日志 ---
@@ -89,12 +89,14 @@ function init() {
     undoBtn = document.getElementById('undo-btn');
     solveBtn = document.getElementById('solve-btn');
     copyBtn = document.getElementById('copy-btn');
+    modeToggle = document.getElementById('mode-toggle');
     initBtn.addEventListener('click', initPage);
     scrambleBtn.addEventListener('click', scrambleCube);
     resetBtn.addEventListener('click', resetCube);
     undoBtn.addEventListener('click', undoMove);
     solveBtn.addEventListener('click', solveCube);
     copyBtn.addEventListener('click', copyCube);
+    modeToggle.addEventListener('change', onModeToggleChange);
 
     updateUndoButtonState();
     log('Initialization complete.');
@@ -350,7 +352,7 @@ function onKeyDown(event) {
         if (controls.enabled) {
             log('Ctrl Down: Rotation mode ACTIVATED.');
             controls.enabled = false;
-            infoMode.textContent = '放开 Ctrl 键以旋转视角';
+            infoMode.textContent = '放开 Ctrl 键或取消勾选以旋转视角';
             infoMode.style.color = '#ff6347';
         }
     }
@@ -361,7 +363,25 @@ function onKeyUp(event) {
         if (!controls.enabled) {
             log('Ctrl Up: Camera mode ACTIVATED.');
             controls.enabled = true;
-            infoMode.textContent = '按住 Ctrl 键以转动方块';
+            infoMode.textContent = '按住 Ctrl 键或勾选以转动方块';
+            infoMode.style.color = '#66bfff';
+        }
+    }
+}
+
+function onModeToggleChange() {
+    if (modeToggle.checked) {
+        if (controls.enabled) {
+            log('Checkbox ON: Rotation mode ACTIVATED.');
+            controls.enabled = false;
+            infoMode.textContent = '放开 Ctrl 键或取消勾选以旋转视角';
+            infoMode.style.color = '#ff6347';
+        }
+    } else {
+        if (!controls.enabled) {
+            log('Checkbox OFF: Camera mode ACTIVATED.');
+            controls.enabled = true;
+            infoMode.textContent = '按住 Ctrl 键或勾选以转动方块';
             infoMode.style.color = '#66bfff';
         }
     }

@@ -89,3 +89,22 @@ button:disabled {
     margin: 0 0 4px 0;
     line-height: 1.2;
 }
+
+.mode-toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #3a3a3a;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #666;
+}
+.mode-toggle-wrap label {
+    font-size: 16px;
+    cursor: pointer;
+    user-select: none;
+}
+#mode-toggle {
+    transform: scale(1.2);
+    cursor: pointer;
+}
