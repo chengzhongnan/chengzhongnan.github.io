@@ -70,6 +70,7 @@ button:disabled {
 }
 
 #log-container {
+    display: none;
     position: absolute;
     bottom: 10px;
     left: 10px;
@@ -88,6 +89,7 @@ button:disabled {
 #log-container p {
     margin: 0 0 4px 0;
     line-height: 1.2;
+    
 }
 
 .mode-toggle-wrap {
