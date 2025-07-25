@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematica Activation</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 美化选择框样式 */
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            color: #333;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-group select:focus {
+            border-color: #007BFF;
+        }
+
+        /* 调整选择框的下拉箭头样式 */
+        .input-group select {
+            appearance: none; /* 隐藏默认下拉箭头 */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 viewBox%3D%220 0 4 5%22%3E%3Cpath fill%3D%22%23000000%22 d%3D%22M2 0L0 2h4L2 0zM0 3h4L2 5 0 3z%22/%3E%3C/svg%3E'); /* 自定义箭头 */
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 10px 10px;
+        }
+
+        /* 输入框和按钮的样式 */
+        .input-group input, .input-group textarea, .button-group button {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .button-group button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .card {
+            width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        .header h1, .header h2 {
+            text-align: center;
+            margin: 0;
+            padding: 10px 0;
+        }
+
+        .instructions p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1>WOLFRAM MATHEMATICA</h1>
+            <h2>手动激活 密钥生成工具</h2>
+        </div>
+        <div class="instructions">
+            <p>第一步：你需要进入到Mathematica的手动激活界面，找到你机器产生的 Math ID。</p>
+            <p>第二步：根据你的Mathematica版本选择合适的选项，输入相关信息后点击生成密码按钮。</p>
+        </div>
+        
+        <!-- 美化后的选择版本的下拉框 -->
+        <div class="input-group">
+            <label for="version-select">选择版本:</label>
+            <select id="version-select" onchange="toggleForm()">
+                <option value="11-13">版本 11-13</option>
+                <option value="14.1">版本 14.1</option>
+            </select>
+        </div>
+
+        <!-- 版本 11-13 对应的表单 -->
+        <div id="form-11-13" class="form-section">
+            <div class="input-group">
+                <label for="math-id">Math ID</label>
+                <input type="text" id="math-id" placeholder="XXXX-XXXXX-XXXXX">
+            </div>
+            <div class="input-group">
+                <label for="activation-key">激活密钥</label>
+                <input type="text" id="activation-key" placeholder="1234-4321-123456">
+            </div>
+            <div class="button-group">
+                <button class="button" id="create">生成密码</button>
+            </div>
+            <div class="input-group">
+                <label for="password">密码</label>
+                <textarea id="password" readonly></textarea>
+            </div>
+        </div>
+
+        <!-- 版本 14.1 对应的表单 -->
+        <div id="form-14-1" class="form-section" style="display: none;">
+            <form id="form" class="form" onsubmit="genPass(event)">
+                <div class="input-group">
+                    <label for="math-id">Math ID</label>
+                    <input type="text" id="math-id" name="mathid" placeholder="XXXX-XXXXX-XXXXX" required>
+                </div>
+                <div class="input-group">
+                    <label for="activation-key">激活密钥</label>
+                    <input type="text" id="activation-key" name="activationkey" value="1234-4321-123456" required>
+                </div>
+                <div class="input-group">
+                    <label for="licensetype">License Type</label>
+                    <input type="text" id="licensetype" name="licensetype" value="803000" required>
+                </div>
+                <div class="input-group">
+                    <label for="salt">Salt</label>
+                    <input type="text" id="salt" name="salt" value="0xD1CF" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="button">生成密码</button>
+                </div>
+            </form>
+            <div class="input-group">
+                <label for="password">密码</label>
+                <textarea id="password" readonly></textarea>
+            </div>
+            <div id="output"></div>
+        </div>
+    </div>
+    
+    <script>
+        // 切换表单显示
+        function toggleForm() {
+            const versionSelect = document.getElementById('version-select').value;
+            const form11to13 = document.getElementById('form-11-13');
+            const form141 = document.getElementById('form-14-1');
+
+            if (versionSelect === '11-13') {
+                form11to13.style.display = 'block';
+                form141.style.display = 'none';
+            } else if (versionSelect === '14.1') {
+                form11to13.style.display = 'none';
+                form141.style.display = 'block';
+            }
+        }
+    </script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>
