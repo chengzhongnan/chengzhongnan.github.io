@@ -115,38 +115,6 @@ function getInitFaceletString() {
     }
 }
 
-// function createRubiksCube(faceletString) {
-//     log('Creating Rubik\'s Cube with rounded corners...');
-//     const offset = (cubeSize - 1) / 2;
-//     const totalPieceSize = pieceSize + gap;
-//     const materials = {
-//         front: new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.2 }), back: new THREE.MeshStandardMaterial({ color: 0xffa500, roughness: 0.2 }),
-//         up: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 }), down: new THREE.MeshStandardMaterial({ color: 0xffff00, roughness: 0.2 }),
-//         right: new THREE.MeshStandardMaterial({ color: 0x0000ff, roughness: 0.2 }), left: new THREE.MeshStandardMaterial({ color: 0x008000, roughness: 0.2 })
-//     };
-//     const innerMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
-
-//     for (let x = 0; x < cubeSize; x++) for (let y = 0; y < cubeSize; y++) for (let z = 0; z < cubeSize; z++) {
-//         if (x > 0 && x < cubeSize - 1 && y > 0 && y < cubeSize - 1 && z > 0 && z < cubeSize - 1) continue;
-
-//         const geometry = new RoundedBoxGeometry(pieceSize, pieceSize, pieceSize, 6, 0.1);
-
-//         const pieceMaterials = [
-//             x === cubeSize - 1 ? materials.right : innerMaterial, x === 0 ? materials.left : innerMaterial,
-//             y === cubeSize - 1 ? materials.up : innerMaterial, y === 0 ? materials.down : innerMaterial,
-//             z === cubeSize - 1 ? materials.front : innerMaterial, z === 0 ? materials.back : innerMaterial
-//         ];
-//         const piece = new THREE.Mesh(geometry, pieceMaterials);
-//         const position = new THREE.Vector3((x - offset) * totalPieceSize, (y - offset) * totalPieceSize, (z - offset) * totalPieceSize);
-//         piece.position.copy(position);
-//         piece.userData.originalPosition = position.clone();
-//         piece.userData.originalQuaternion = piece.quaternion.clone();
-//         cubes.push(piece);
-//         scene.add(piece);
-//     }
-//     log('Cube created.');
-// }
-
 function createRubiksCube(faceletString) {
     log('Creating Rubik\'s Cube with rounded corners...');
     const offset = (cubeSize - 1) / 2;
@@ -507,6 +475,17 @@ function startRotation(event) {
  * @param {THREE.Object3D} endCube 结束立方体
  */
 function rotateByDragAcross(startCube, endCube) {
+
+    // 两个坐标的（x,y,z）中必须有两个值是相等的，否则不做任何操作
+    const equalsAxis = cubePositionEqual(startCube.position.x, endCube.position.x) 
+                    + cubePositionEqual(startCube.position.y, endCube.position.y) 
+                    + cubePositionEqual(startCube.position.z, endCube.position.z) ;
+    
+    if (equalsAxis !== 2) {
+        isAnimating = false;
+        return false;
+    }
+
     // 计算起始和结束位置的世界坐标
     const startPos = startCube.getWorldPosition(new THREE.Vector3());
     const endPos = endCube.getWorldPosition(new THREE.Vector3());
@@ -538,7 +517,7 @@ function rotateByDragAcross(startCube, endCube) {
     if (rotationAxis.lengthSq() < 0.5) {
         log('Rotation failed: Ambiguous drag across cubes.');
         isAnimating = false;
-        return;
+        return false;
     }
 
     const angle = 0 - Math.PI / 2; // 90度旋转
