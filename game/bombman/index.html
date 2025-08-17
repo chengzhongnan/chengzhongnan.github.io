@@ -397,9 +397,11 @@
                     y = monsterGridY * 2;
 
                 } while (
-                    gameState.board[monsterGridY][monsterGridX] !== 'empty' ||
+                    gameState.board[monsterGridY][monsterGridX] !== 'empty' &&
                     (Math.abs(monsterGridX - playerGridX) <= 4 && Math.abs(monsterGridY - playerGridY) <= 4)
                 );
+
+                // console.log(`生成怪物 ${i + 1}: (${x}, ${y})`);
 
                 // 为每个怪物添加新的状态属性
                 enemies.push({
