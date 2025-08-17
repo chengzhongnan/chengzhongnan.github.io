@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炸弹人</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            color: #ff6b35;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- MODIFICATION START: Added a wrapper for padding and border --- */
+        .board-wrapper {
+            background: #2d5016;
+            padding: 10px;
+            /* Padding is now here */
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            border: 3px solid #34495e;
+            /* Border is now here */
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(15, 48px);
+            grid-template-rows: repeat(13, 48px);
+            gap: 0;
+            position: relative;
+            /* Removed padding, border, etc. from here */
+        }
+
+        /* --- MODIFICATION END --- */
+
+        .cell {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .character,
+        .enemy-sprite {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            z-index: 10;
+            transition: all 0.1s linear;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .character svg,
+        .enemy-sprite svg {
+            width: 85%;
+            height: 85%;
+        }
+
+        .empty {
+            background: #8FBC8F;
+        }
+
+        .wall {
+            background: #555;
+        }
+
+        .brick {
+            background: #cd853f;
+        }
+
+        .bomb svg {
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        .explosion svg {
+            animation: explode 0.3s ease-out;
+        }
+
+        .powerup svg {
+            animation: glow 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(0.5);
+            }
+
+            50% {
+                transform: scale(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                filter: brightness(1);
+            }
+
+            to {
+                filter: brightness(1.5) drop-shadow(0 0 10px #ffff00);
+            }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .control-group h3 {
+            margin: 0 0 10px 0;
+            color: #ff6b35;
+        }
+
+        .status {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6b35, #f39c12);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            margin: 0 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff6b35;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <h1>🧨 炸弹人 🧨</h1>
+        <div class="status">
+            <div class="status-item">
+                <div class="status-value" id="score">0</div>
+                <div>分数</div>
+            </div>
+            <div class="status-item">
+                <div class="status-value" id="level">1</div>
+                <div>关卡</div>
+            </div>
+            <div class="status-item">
+                <div class="status-value" id="lives">3</div>
+                <div>生命</div>
+            </div>
+            <div class="status-item">
+                <div class="status-value" id="bombs">1</div>
+                <div>炸弹</div>
+            </div>
+        </div>
+
+        <div class="board-wrapper">
+            <div class="game-board" id="gameBoard"></div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <h3>移动控制</h3>
+                <p>↑↓←→ 方向键移动</p>
+            </div>
+            <div class="control-group">
+                <h3>游戏控制</h3>
+                <p>空格键 或 X键 放置炸弹</p>
+            </div>
+        </div>
+        <button onclick="startGame()">开始游戏</button>
+        <button onclick="resetGame()">重新开始</button>
+    </div>
+    <div id="gameOverScreen" class="game-over hidden">
+        <h2 id="gameOverTitle">游戏结束</h2>
+        <p id="gameOverMessage">你的最终分数：<span id="finalScore">0</span></p>
+        <button onclick="resetGame()">再玩一次</button>
+    </div>
+    <script>
+        // The script part remains unchanged as the logic was correct.
+        const BOARD_WIDTH = 15;
+        const BOARD_HEIGHT = 13;
+        const HALF_GRID = 24;
+        const MOVE_STEP = 1.0;
+        const ENEMY_MOVE_STEP = 1.0;
+
+        const SVG_GRAPHICS = {
+            empty: () => `<svg viewBox="0 0 48 48"><rect width="48" height="48" fill="#8FBC8F"/></svg>`,
+            wall: () => `<svg viewBox="0 0 48 48">
+                            <defs>
+                                <linearGradient id="wallGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#888;" />
+                                    <stop offset="100%" style="stop-color:#707070;" />
+                                </linearGradient>
+                            </defs>
+                            <rect x="0" y="0" width="48" height="48" fill="url(#wallGradient)"/>
+                        </svg>`,
+            brick: () => `<svg viewBox="0 0 48 48">
+                        <rect width="48" height="48" fill="#8B4513"/>
+                        <rect x="0" y="0" width="24" height="12" fill="#CD853F"/>
+                        <rect x="24" y="12" width="24" height="12" fill="#CD853F"/>
+                        <rect x="0" y="24" width="24" height="12" fill="#CD853F"/>
+                        <rect x="24" y="36" width="24" height="12" fill="#CD853F"/>
+                        <rect x="0" y="0" width="48" height="2" fill="#DEB887"/>
+                        <rect x="0" y="12" width="48" height="2" fill="#DEB887"/>
+                        <rect x="0" y="24" width="48" height="2" fill="#DEB887"/>
+                        <rect x="0" y="36" width="48" height="2" fill="#DEB887"/>
+                        <rect x="24" y="0" width="2" height="12" fill="#DEB887"/>
+                        <rect x="24" y="24" width="2" height="12" fill="#DEB887"/>
+                    </svg>`,
+            player: () => `<svg viewBox="0 0 48 48">
+                        <defs>
+                            <radialGradient id="headGradient" cx="0.5" cy="0.5" r="0.6">
+                                <stop offset="0%" style="stop-color:#FFFFFF;" />
+                                <stop offset="80%" style="stop-color:#E8E8E8;" />
+                                <stop offset="100%" style="stop-color:#C0C0C0;" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="17" cy="41" r="5" fill="#E55371"/>
+                        <circle cx="31" cy="41" r="5" fill="#E55371"/>
+                        <path d="M12,40 C12,28 36,28 36,40 Z" fill="#3A8CF8" stroke="#275EAE" stroke-width="1.5"/>
+                        <circle cx="9" cy="32" r="4" fill="url(#headGradient)" stroke="#333" stroke-width="1"/>
+                        <circle cx="39" cy="32" r="4" fill="url(#headGradient)" stroke="#333" stroke-width="1"/>
+                        <circle cx="24" cy="24" r="13" fill="url(#headGradient)" stroke="#333" stroke-width="1.5"/>
+                        <rect x="18" y="23" width="3" height="7" rx="1.5" fill="black"/>
+                        <rect x="27" y="23" width="3" height="7" rx="1.5" fill="black"/>
+                        <rect x="22.5" y="7" width="3" height="6" fill="#C0C0C0" stroke="#333" stroke-width="1"/>
+                        <circle cx="24" cy="6" r="4" fill="#E55371" stroke="#A8384F" stroke-width="1"/>
+                    </svg>`,
+            enemy: () => `<svg viewBox="0 0 48 48">
+                            <rect x="6" y="8" width="36" height="36" fill="#ADD8E6" rx="10" ry="10" />
+                            <circle cx="16" cy="24" r="6" fill="#FFF" />
+                            <circle cx="32" cy="24" r="6" fill="#FFF" />
+                            <circle cx="16" cy="24" r="2.5" fill="#000" />
+                            <circle cx="32" cy="24" r="2.5" fill="#000" />
+                            <path d="M 14 38 C 20 42, 28 42, 34 38" fill="none" stroke="#63A5C6" stroke-width="3" stroke-linecap="round" />
+                        </svg>`,
+            bomb: () => `<svg viewBox="0 0 48 48">
+                        <circle cx="24" cy="28" r="14" fill="#000"/>
+                        <circle cx="24" cy="28" r="12" fill="#333"/>
+                        <rect x="28" y="8" width="3" height="12" fill="#8B4513"/>
+                        <ellipse cx="32" cy="6" rx="4" ry="3" fill="#FF4500"/>
+                        <ellipse cx="32" cy="6" rx="2" ry="1.5" fill="#FFD700"/>
+                        <circle cx="20" cy="24" r="2" fill="#666"/>
+                        <circle cx="28" cy="32" r="1.5" fill="#666"/>
+                    </svg>`,
+            explosion: () => `<svg viewBox="0 0 48 48">
+                        <circle cx="24" cy="24" r="20" fill="#FF6B35"/>
+                        <circle cx="24" cy="24" r="16" fill="#FF8C00"/>
+                        <circle cx="24" cy="24" r="12" fill="#FFD700"/>
+                        <circle cx="24" cy="24" r="8" fill="#FFFF00"/>
+                        <circle cx="24" cy="24" r="4" fill="#FFF"/>
+                        <polygon points="24,4 28,16 40,12 32,24 44,28 32,32 40,44 28,36 24,48 20,36 8,44 16,32 4,28 16,24 8,12 20,16" fill="#FF4500"/>
+                    </svg>`,
+            powerup: () => `<svg viewBox="0 0 48 48">
+                        <circle cx="24" cy="24" r="18" fill="#9B59B6"/>
+                        <circle cx="24" cy="24" r="14" fill="#8E44AD"/>
+                        <polygon points="24,8 28,18 38,16 30,24 40,28 30,32 38,40 28,36 24,46 20,36 10,40 18,32 8,28 18,24 10,16 20,18" fill="#FFD700"/>
+                        <circle cx="24" cy="24" r="6" fill="#FFF"/>
+                        <text x="24" y="28" text-anchor="middle" font-size="12" fill="#9B59B6" font-weight="bold">+</text>
+                    </svg>`
+        };
+
+        let gameState = {};
+        function halfToGrid(halfCoord) { return Math.floor(halfCoord / 2); }
+        function halfToPixel(halfCoord) { return halfCoord * HALF_GRID; }
+        function isInGridCenter(halfX, halfY) { return halfX % 2 === 0 && halfY % 2 === 0; }
+        function initBoard() {
+            const board = Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill('empty'));
+            for (let y = 0; y < BOARD_HEIGHT; y++) {
+                for (let x = 0; x < BOARD_WIDTH; x++) {
+                    if (x === 0 || y === 0 || x === BOARD_WIDTH - 1 || y === BOARD_HEIGHT - 1 || (x % 2 === 0 && y % 2 === 0)) {
+                        board[y][x] = 'wall';
+                    } else if (!((x < 3 && y < 3) || (x > BOARD_WIDTH - 4 && y > BOARD_HEIGHT - 4))) {
+                        if (Math.random() < 0.7) board[y][x] = 'brick';
+                    }
+                }
+            }
+            return board;
+        }
+        function initEnemies() {
+            const enemies = [];
+            const enemyCount = Math.min(gameState.level + 2, 8);
+            for (let i = 0; i < enemyCount; i++) {
+                let x, y;
+                do {
+                    x = (Math.floor(Math.random() * (BOARD_WIDTH - 2)) + 1) * 2;
+                    y = (Math.floor(Math.random() * (BOARD_HEIGHT - 2)) + 1) * 2;
+                } while (gameState.board[halfToGrid(y)][halfToGrid(x)] !== 'empty' || (Math.abs(x - gameState.player.x) < 8 && Math.abs(y - gameState.player.y) < 8));
+                enemies.push({ x, y });
+            }
+            return enemies;
+        }
+        function renderBoard() {
+            const boardElement = document.getElementById('gameBoard');
+            boardElement.innerHTML = '';
+            gameState.board.forEach((row, y) => {
+                row.forEach((type, x) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (gameState.explosions.find(e => e.x === x && e.y === y)) {
+                        cell.innerHTML = SVG_GRAPHICS.explosion();
+                    } else if (gameState.bombs.find(b => halfToGrid(b.x) === x && halfToGrid(b.y) === y)) {
+                        cell.innerHTML = SVG_GRAPHICS.bomb();
+                    } else if (gameState.powerUps.find(p => p.x === x && p.y === y)) {
+                        cell.innerHTML = SVG_GRAPHICS.powerup();
+                    } else {
+                        cell.innerHTML = SVG_GRAPHICS[type]();
+                    }
+                    boardElement.appendChild(cell);
+                });
+            });
+            renderCharacter();
+            renderEnemies();
+            updateStatus();
+        }
+        function renderCharacter() {
+            const boardElement = document.getElementById('gameBoard');
+            const existingPlayer = document.querySelector('.character');
+            if (existingPlayer) {
+                existingPlayer.remove();
+            }
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'character';
+            playerDiv.innerHTML = SVG_GRAPHICS.player();
+            playerDiv.style.left = halfToPixel(gameState.player.x) + 'px';
+            playerDiv.style.top = halfToPixel(gameState.player.y) + 'px';
+            boardElement.appendChild(playerDiv);
+        }
+        function renderEnemies() {
+            const boardElement = document.getElementById('gameBoard');
+            document.querySelectorAll('.enemy-sprite').forEach(el => el.remove());
+            gameState.enemies.forEach(enemy => {
+                const enemyDiv = document.createElement('div');
+                enemyDiv.className = 'enemy-sprite';
+                enemyDiv.innerHTML = SVG_GRAPHICS.enemy();
+                enemyDiv.style.left = halfToPixel(enemy.x) + 'px';
+                enemyDiv.style.top = halfToPixel(enemy.y) + 'px';
+                boardElement.appendChild(enemyDiv);
+            });
+        }
+        function updateStatus() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('lives').textContent = gameState.lives;
+            document.getElementById('bombs').textContent = gameState.bombCount;
+        }
+        function isObstacleAt(gridX, gridY) {
+            if (gridX < 0 || gridX >= BOARD_WIDTH || gridY < 0 || gridY >= BOARD_HEIGHT) return true;
+            const cellType = gameState.board[gridY]?.[gridX];
+            return cellType === 'wall' || cellType === 'brick';
+        }
+        function isBombAt(gridX, gridY) {
+            return gameState.bombs.some(b => halfToGrid(b.x) === gridX && halfToGrid(b.y) === gridY);
+        }
+        function moveCharacter(character, dx, dy) {
+            const { x, y } = character;
+            const newX = x + dx;
+            const newY = y + dy;
+            const size = 1.999;
+            const corners = [
+                { x: newX, y: newY }, { x: newX + size, y: newY },
+                { x: newX, y: newY + size }, { x: newX + size, y: newY + size }
+            ];
+            for (const corner of corners) {
+                if (isObstacleAt(halfToGrid(corner.x), halfToGrid(corner.y))) {
+                    return false;
+                }
+            }
+            const currentCenterGrid = { x: halfToGrid(x + 1), y: halfToGrid(y + 1) };
+            const newCenterGrid = { x: halfToGrid(newX + 1), y: halfToGrid(newY + 1) };
+            if (isBombAt(newCenterGrid.x, newCenterGrid.y)) {
+                if (newCenterGrid.x !== currentCenterGrid.x || newCenterGrid.y !== currentCenterGrid.y) {
+                    return false;
+                }
+            }
+            character.x = newX;
+            character.y = newY;
+            return true;
+        }
+        function movePlayer(dx, dy) {
+            if (!gameState.gameRunning) return;
+            if (moveCharacter(gameState.player, dx, dy)) {
+                if (isInGridCenter(gameState.player.x, gameState.player.y)) {
+                    const gridX = halfToGrid(gameState.player.x);
+                    const gridY = halfToGrid(gameState.player.y);
+                    const powerUpIndex = gameState.powerUps.findIndex(p => p.x === gridX && p.y === gridY);
+                    if (powerUpIndex !== -1) {
+                        const powerUp = gameState.powerUps.splice(powerUpIndex, 1)[0];
+                        if (powerUp.type === 'bomb') gameState.bombCount++;
+                        else if (powerUp.type === 'power') gameState.bombPower++;
+                        gameState.score += 50;
+                    }
+                }
+            }
+        }
+        function placeBomb() {
+            if (!gameState.gameRunning || gameState.bombs.length >= gameState.bombCount) return;
+            const gridX = halfToGrid(gameState.player.x + 1);
+            const gridY = halfToGrid(gameState.player.y + 1);
+            const halfX = gridX * 2;
+            const halfY = gridY * 2;
+            if (gameState.bombs.some(b => halfToGrid(b.x) === gridX && halfToGrid(b.y) === gridY)) return;
+            gameState.bombs.push({ x: halfX, y: halfY, timer: 3000, power: gameState.bombPower });
+        }
+        function explodeBomb(bomb) {
+            const bombGridX = halfToGrid(bomb.x);
+            const bombGridY = halfToGrid(bomb.y);
+            let explosions = [{ x: bombGridX, y: bombGridY }];
+            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+            directions.forEach(([dx, dy]) => {
+                for (let i = 1; i <= bomb.power; i++) {
+                    const x = bombGridX + dx * i;
+                    const y = bombGridY + dy * i;
+                    if (x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT || gameState.board[y][x] === 'wall') break;
+                    explosions.push({ x, y });
+                    if (gameState.board[y][x] === 'brick') {
+                        gameState.board[y][x] = 'empty';
+                        gameState.score += 10;
+                        if (Math.random() < 0.3) {
+                            gameState.powerUps.push({ x, y, type: Math.random() < 0.5 ? 'bomb' : 'power' });
+                        }
+                        break;
+                    }
+                }
+            });
+            explosions.forEach(pos => gameState.explosions.push({ ...pos, timer: 500 }));
+            const playerGridPos = { x: halfToGrid(gameState.player.x + 1), y: halfToGrid(gameState.player.y + 1) };
+            if (explosions.some(e => e.x === playerGridPos.x && e.y === playerGridPos.y)) {
+                playerHit();
+            }
+            gameState.enemies = gameState.enemies.filter(enemy => {
+                const enemyGridPos = { x: halfToGrid(enemy.x + 1), y: halfToGrid(enemy.y + 1) };
+                if (explosions.some(e => e.x === enemyGridPos.x && e.y === enemyGridPos.y)) {
+                    gameState.score += 100;
+                    return false;
+                }
+                return true;
+            });
+            gameState.bombs.forEach(otherBomb => {
+                const otherBombGridPos = { x: halfToGrid(otherBomb.x), y: halfToGrid(otherBomb.y) };
+                if (otherBomb !== bomb && explosions.some(e => e.x === otherBombGridPos.x && e.y === otherBombGridPos.y)) {
+                    otherBomb.timer = 0;
+                }
+            });
+        }
+        function playerHit() {
+            gameState.lives--;
+            if (gameState.lives <= 0) {
+                endGame(false);
+            } else {
+                gameState.player.x = 2;
+                gameState.player.y = 2;
+            }
+        }
+        function moveEnemies() {
+            if (!gameState.gameRunning) return;
+            gameState.enemies.forEach(enemy => {
+                const directions = [[-ENEMY_MOVE_STEP, 0], [ENEMY_MOVE_STEP, 0], [0, -ENEMY_MOVE_STEP], [0, ENEMY_MOVE_STEP]];
+                const [dx, dy] = directions[Math.floor(Math.random() * directions.length)];
+                moveCharacter(enemy, dx, dy);
+                const enemyGridPos = { x: halfToGrid(enemy.x + 1), y: halfToGrid(enemy.y + 1) };
+                const playerGridPos = { x: halfToGrid(gameState.player.x + 1), y: halfToGrid(gameState.player.y + 1) };
+                if (enemyGridPos.x === playerGridPos.x && enemyGridPos.y === playerGridPos.y) {
+                    playerHit();
+                }
+            });
+        }
+        function gameLoop() {
+            if (!gameState.gameRunning) return;
+            const now = Date.now();
+            const deltaTime = now - gameState.lastTick;
+            gameState.lastTick = now;
+            gameState.bombs = gameState.bombs.filter(bomb => {
+                bomb.timer -= deltaTime;
+                if (bomb.timer <= 0) {
+                    explodeBomb(bomb);
+                    return false;
+                }
+                return true;
+            });
+            gameState.explosions = gameState.explosions.filter(explosion => {
+                explosion.timer -= deltaTime;
+                return explosion.timer > 0;
+            });
+            if (gameState.enemies.length === 0) {
+                nextLevel();
+            }
+            renderBoard();
+        }
+        function nextLevel() {
+            gameState.level++;
+            gameState.score += gameState.level * 500;
+            resetLevel();
+        }
+        function endGame(isWin) {
+            gameState.gameRunning = false;
+            clearInterval(gameState.enemyMoveInterval);
+            clearInterval(gameState.gameLoopInterval);
+            document.getElementById('gameOverTitle').textContent = isWin ? "恭喜通关！" : "游戏结束";
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+        }
+        function resetLevel() {
+            gameState.board = initBoard();
+            gameState.enemies = initEnemies();
+            gameState.bombs = [];
+            gameState.explosions = [];
+            gameState.powerUps = [];
+            gameState.player.x = 2;
+            gameState.player.y = 2;
+        }
+        function startGame() {
+            if (gameState.gameRunning) return;
+            gameState = {
+                board: null, player: { x: 2, y: 2 }, enemies: [], bombs: [], explosions: [], powerUps: [],
+                score: 0, level: 1, lives: 3, bombCount: 1, bombPower: 1,
+                gameRunning: true,
+                lastTick: Date.now(),
+                enemyMoveInterval: null, gameLoopInterval: null
+            };
+            resetLevel();
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            gameState.gameLoopInterval = setInterval(gameLoop, 100);
+            gameState.enemyMoveInterval = setInterval(moveEnemies, 250);
+            renderBoard();
+        }
+        function resetGame() {
+            if (gameState.enemyMoveInterval) clearInterval(gameState.enemyMoveInterval);
+            if (gameState.gameLoopInterval) clearInterval(gameState.gameLoopInterval);
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            startGame();
+        }
+        document.addEventListener('keydown', (e) => {
+            if (!gameState.gameRunning) return;
+            let handled = true;
+            switch (e.key.toLowerCase()) {
+                case 'arrowup': movePlayer(0, -MOVE_STEP); break;
+                case 'arrowdown': movePlayer(0, MOVE_STEP); break;
+                case 'arrowleft': movePlayer(-MOVE_STEP, 0); break;
+                case 'arrowright': movePlayer(MOVE_STEP, 0); break;
+                case ' ':
+                case 'x':
+                    placeBomb();
+                    break;
+                default: handled = false; break;
+            }
+            if (handled) e.preventDefault();
+        });
+        startGame();
+    </script>
+</body>
+
+</html>
