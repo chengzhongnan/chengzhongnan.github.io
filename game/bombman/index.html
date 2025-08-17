@@ -398,7 +398,7 @@
 
                 } while (
                     gameState.board[monsterGridY][monsterGridX] !== 'empty' ||
-                    (Math.abs(monsterGridX - playerGridX) <= 2 && Math.abs(monsterGridY - playerGridY) <= 2)
+                    (Math.abs(monsterGridX - playerGridX) <= 4 && Math.abs(monsterGridY - playerGridY) <= 4)
                 );
 
                 // 为每个怪物添加新的状态属性
