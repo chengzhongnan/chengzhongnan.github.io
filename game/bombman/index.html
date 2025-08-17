@@ -281,7 +281,7 @@
         const BOARD_HEIGHT = 13;
         const HALF_GRID = 24;
         const MOVE_STEP = 1.0;
-        const ENEMY_MOVE_STEP = 1.0;
+        const ENEMY_MOVE_STEP = 0.5;
 
         const SVG_GRAPHICS = {
             empty: () => `<svg viewBox="0 0 48 48"><rect width="48" height="48" fill="#8FBC8F"/></svg>`,
@@ -371,7 +371,7 @@
                     if (x === 0 || y === 0 || x === BOARD_WIDTH - 1 || y === BOARD_HEIGHT - 1 || (x % 2 === 0 && y % 2 === 0)) {
                         board[y][x] = 'wall';
                     } else if (!((x < 3 && y < 3) || (x > BOARD_WIDTH - 4 && y > BOARD_HEIGHT - 4))) {
-                        if (Math.random() < 0.7) board[y][x] = 'brick';
+                        if (Math.random() < 0.6) board[y][x] = 'brick';
                     }
                 }
             }
@@ -379,7 +379,7 @@
         }
         function initEnemies() {
             const enemies = [];
-            const enemyCount = Math.min(gameState.level + 2, 8);
+            const enemyCount = Math.min(gameState.level + 4, 12);
             for (let i = 0; i < enemyCount; i++) {
                 let x, y;
                 do {
@@ -621,7 +621,7 @@
             resetLevel();
             document.getElementById('gameOverScreen').classList.add('hidden');
             gameState.gameLoopInterval = setInterval(gameLoop, 100);
-            gameState.enemyMoveInterval = setInterval(moveEnemies, 250);
+            gameState.enemyMoveInterval = setInterval(moveEnemies, 100);
             renderBoard();
         }
         function resetGame() {
