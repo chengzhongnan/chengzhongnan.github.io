@@ -379,11 +379,23 @@
             return board;
         }
 
+        function checkEnemyPosition(monsterGridX, monsterGridY) {
+            if (gameState.board[monsterGridY][monsterGridX] !== 'empty') {
+                return false; // 如果位置不是空的，返回 false
+            }
+            
+            const playerGridX = halfToGrid(gameState.player.x);
+            const playerGridY = halfToGrid(gameState.player.y);
+            if ((Math.abs(monsterGridX - playerGridX) <= 4 && Math.abs(monsterGridY - playerGridY) <= 4)) {
+                return false; // 如果怪物与玩家距离过近，返回 false
+            }
+
+            return true; // 如果位置是空的且距离玩家足够远，返回 true
+        }
+
         function initEnemies() {
             const enemies = [];
             const enemyCount = Math.min(gameState.level + 2, 8);
-            const playerGridX = halfToGrid(gameState.player.x);
-            const playerGridY = halfToGrid(gameState.player.y);
 
             for (let i = 0; i < enemyCount; i++) {
                 let x, y;
@@ -397,12 +409,9 @@
                     y = monsterGridY * 2;
 
                 } while (
-                    gameState.board[monsterGridY][monsterGridX] !== 'empty' &&
-                    (Math.abs(monsterGridX - playerGridX) <= 4 && Math.abs(monsterGridY - playerGridY) <= 4)
+                    !checkEnemyPosition(monsterGridX, monsterGridY)
                 );
-
-                // console.log(`生成怪物 ${i + 1}: (${x}, ${y})`);
-
+                
                 // 为每个怪物添加新的状态属性
                 enemies.push({
                     x,
@@ -677,12 +686,12 @@
         }
         function resetLevel() {
             gameState.board = initBoard();
+            gameState.player.x = 2;
+            gameState.player.y = 2;
             gameState.enemies = initEnemies();
             gameState.bombs = [];
             gameState.explosions = [];
             gameState.powerUps = [];
-            gameState.player.x = 2;
-            gameState.player.y = 2;
         }
         function startGame() {
             if (gameState.gameRunning) return;
