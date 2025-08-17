@@ -265,6 +265,7 @@
             <div class="control-group">
                 <h3>游戏控制</h3>
                 <p>空格键 或 X键 放置炸弹</p>
+                <p>Z键 增加生命</p>
             </div>
         </div>
         <button onclick="startGame()">开始游戏</button>
@@ -377,19 +378,40 @@
             }
             return board;
         }
+
         function initEnemies() {
             const enemies = [];
-            const enemyCount = Math.min(gameState.level + 4, 12);
+            const enemyCount = Math.min(gameState.level + 2, 8);
+            const playerGridX = halfToGrid(gameState.player.x);
+            const playerGridY = halfToGrid(gameState.player.y);
+
             for (let i = 0; i < enemyCount; i++) {
                 let x, y;
+                let monsterGridX, monsterGridY;
+
                 do {
-                    x = (Math.floor(Math.random() * (BOARD_WIDTH - 2)) + 1) * 2;
-                    y = (Math.floor(Math.random() * (BOARD_HEIGHT - 2)) + 1) * 2;
-                } while (gameState.board[halfToGrid(y)][halfToGrid(x)] !== 'empty' || (Math.abs(x - gameState.player.x) < 8 && Math.abs(y - gameState.player.y) < 8));
-                enemies.push({ x, y });
+                    monsterGridX = Math.floor(Math.random() * (BOARD_WIDTH - 2)) + 1;
+                    monsterGridY = Math.floor(Math.random() * (BOARD_HEIGHT - 2)) + 1;
+
+                    x = monsterGridX * 2;
+                    y = monsterGridY * 2;
+
+                } while (
+                    gameState.board[monsterGridY][monsterGridX] !== 'empty' ||
+                    (Math.abs(monsterGridX - playerGridX) <= 2 && Math.abs(monsterGridY - playerGridY) <= 2)
+                );
+
+                // 为每个怪物添加新的状态属性
+                enemies.push({
+                    x,
+                    y,
+                    lastMove: null,       // 初始化上次移动为空
+                    lastMoveSuccess: true // 初始状态视为成功
+                });
             }
             return enemies;
         }
+
         function renderBoard() {
             const boardElement = document.getElementById('gameBoard');
             boardElement.innerHTML = '';
@@ -554,16 +576,67 @@
         }
         function moveEnemies() {
             if (!gameState.gameRunning) return;
+
+            const directions = [
+                { dx: ENEMY_MOVE_STEP, dy: 0 },   // Right
+                { dx: -ENEMY_MOVE_STEP, dy: 0 },  // Left
+                { dx: 0, dy: ENEMY_MOVE_STEP },   // Down
+                { dx: 0, dy: -ENEMY_MOVE_STEP }   // Up
+            ];
+
             gameState.enemies.forEach(enemy => {
-                const directions = [[-ENEMY_MOVE_STEP, 0], [ENEMY_MOVE_STEP, 0], [0, -ENEMY_MOVE_STEP], [0, ENEMY_MOVE_STEP]];
-                const [dx, dy] = directions[Math.floor(Math.random() * directions.length)];
-                moveCharacter(enemy, dx, dy);
+                let potentialMoves = [...directions];
+                let chosenMove = null;
+                const rand = Math.random();
+
+                if (enemy.lastMove) {
+                    if (enemy.lastMoveSuccess && rand < 0.70) {
+                        // 70% 概率继续沿原方向移动
+                        chosenMove = enemy.lastMove;
+                    } else if (!enemy.lastMoveSuccess && rand < 0.70) {
+                        // 70% 概率沿反方向移动
+                        chosenMove = { dx: -enemy.lastMove.dx, dy: -enemy.lastMove.dy };
+                    }
+                }
+
+                // 如果没有根据历史决定方向 (30%的随机情况或第一次移动)
+                if (!chosenMove) {
+                    chosenMove = potentialMoves[Math.floor(Math.random() * potentialMoves.length)];
+                }
+
+                // 尝试移动
+                let moveSuccessful = moveCharacter(enemy, chosenMove.dx, chosenMove.dy);
+
+                // 如果首选方向移动失败，则尝试其他随机方向
+                if (!moveSuccessful) {
+                    // 从所有可能的移动中移除失败的那个
+                    potentialMoves = potentialMoves.filter(m => !(m.dx === chosenMove.dx && m.dy === chosenMove.dy));
+                    // 打乱剩余方向的顺序
+                    potentialMoves.sort(() => 0.5 - Math.random());
+
+                    for (const move of potentialMoves) {
+                        if (moveCharacter(enemy, move.dx, move.dy)) {
+                            chosenMove = move;
+                            moveSuccessful = true;
+                            break; // 找到一个能动的方向就停止
+                        }
+                    }
+                }
+
+                // 更新怪物的状态
+                enemy.lastMove = chosenMove;
+                enemy.lastMoveSuccess = moveSuccessful;
+
+                // 检查与玩家的碰撞
                 const enemyGridPos = { x: halfToGrid(enemy.x + 1), y: halfToGrid(enemy.y + 1) };
                 const playerGridPos = { x: halfToGrid(gameState.player.x + 1), y: halfToGrid(gameState.player.y + 1) };
                 if (enemyGridPos.x === playerGridPos.x && enemyGridPos.y === playerGridPos.y) {
                     playerHit();
                 }
             });
+
+            // 移动结束后统一渲染
+            renderEnemies();
         }
         function gameLoop() {
             if (!gameState.gameRunning) return;
@@ -630,6 +703,10 @@
             document.getElementById('gameOverScreen').classList.add('hidden');
             startGame();
         }
+        function addPlayerLife() {
+            gameState.lives++;
+            updateStatus();
+        }
         document.addEventListener('keydown', (e) => {
             if (!gameState.gameRunning) return;
             let handled = true;
@@ -641,6 +718,9 @@
                 case ' ':
                 case 'x':
                     placeBomb();
+                    break;
+                case 'z':
+                    addPlayerLife();
                     break;
                 default: handled = false; break;
             }
