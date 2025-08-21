@@ -84,6 +84,11 @@ function createBoard() {
 function handleClick(event) {
     const row = parseInt(event.target.dataset.row);
     const col = parseInt(event.target.dataset.col);
+
+    if (event.target.classList.contains('flagged')) {
+        return;
+    }
+
     revealCell(row, col);
 }
 
@@ -91,6 +96,11 @@ function handleRightClick(event) {
     event.preventDefault();
     const row = parseInt(event.target.dataset.row);
     const col = parseInt(event.target.dataset.col);
+
+    if (event.target.classList.contains('open')) {
+        return;
+    }
+
     if (event.target.classList.contains('flagged')) {
         event.target.classList.remove('flagged');
     } else {
