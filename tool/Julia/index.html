@@ -184,6 +184,25 @@
         <div class="controls">
             <div class="control-group">
                 <h3>Julia集参数</h3>
+
+                <div class="input-group">
+                    <label>迭代函数</label>
+                    <select id="iteration-function">
+                        <option value="z-squared" selected>z² + c (经典)</option>
+                        <option value="z-cubed">z³ + c</option>
+                        <option value="z-fourth">z⁴ + c</option>
+                        <option value="z-fifth">z⁵ + c</option>
+                        <option value="inv-z">1/z + c</option>
+                        <option value="logistic-map">cz(1-z)</option>
+                        <option value="z-sqrt">√z + c</option>
+                        <option value="exp-z">c * e^z</option>
+                        <option value="exp-z2">c * e^(-z)</option>
+                        <option value="log-z">c Log(z)</option>
+                        <option value="sin-z">c * sin(z)</option>
+                        <option value="cos-z">c * cos(z)</option>
+                    </select>
+                </div>
+
                 <div class="input-group">
                     <label>实部 (C.real)</label>
                     <input type="number" id="c-real" value="-0.75" step="0.01" min="-2" max="2">
@@ -283,6 +302,8 @@
                 this.isDragging = false;
                 this.dragStart = { x: 0, y: 0 };
 
+                this.setupIterationFunctions();
+
                 this.render();
             }
 
@@ -304,7 +325,11 @@
                     'c-imag': (v) => { this.cImag = parseFloat(v); this.render(); },
                     'max-iterations': (v) => { this.maxIterations = parseInt(v); this.render(); },
                     'color-scheme': (v) => { this.colorScheme = v; this.render(); },
-                    'smooth-coloring': (v) => { this.smoothColoring = v; this.render(); }
+                    'smooth-coloring': (v) => { this.smoothColoring = v; this.render(); },
+                    'iteration-function': (v) => {
+                        this.iterationFn = this.ITERATION_FUNCTIONS[v];
+                        this.render();
+                    }
                 };
 
                 Object.keys(controls).forEach(id => {
@@ -403,6 +428,237 @@
                 this.zoomInfo.textContent = `缩放: ${zoomStr}x`;
             }
 
+            // <script> 標籤內，class 定義之前
+
+            setupIterationFunctions() {
+                this.ITERATION_FUNCTIONS = {
+                    // 经典的 Z^2 + C
+                    'z-squared': {
+                        name: 'z² + c (經典)',
+                        description: '經典的二次多項式 Julia 集。',
+                        // z_n+1 = z_n^2 + c
+                        // z = x + yi => z^2 = (x^2 - y^2) + (2xy)i
+                        calculate: (x, y, cReal, cImag) => {
+                            const newX = x * x - y * y + cReal;
+                            const newY = 2 * x * y + cImag;
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    // Z^3 + C
+                    'z-cubed': {
+                        name: 'z³ + c',
+                        description: '三次多項式，通常產生三臂旋轉對稱的圖形。',
+                        // z^3 = (x^3 - 3xy^2) + (3x^2y - y^3)i
+                        calculate: (x, y, cReal, cImag) => {
+                            const x2 = x * x;
+                            const y2 = y * y;
+                            const newX = x * (x2 - 3 * y2) + cReal;
+                            const newY = y * (3 * x2 - y2) + cImag;
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'inv-z': {
+                        name: '1/z + c (反函數)',
+                        description: '反函數在原點有一個奇點，常產生環狀、島嶼或塵埃狀分形。',
+                        // 迭代公式: z_n+1 = 1/z_n + c
+                        calculate: (x, y, cReal, cImag) => {
+                            // 計算 1/z = (x - yi) / (x² + y²)
+                            const denominator = x * x + y * y;
+
+                            // 處理 z=0 的情況，此時分母為0，結果趨向無窮大
+                            // 我們可以直接返回一個很大的數，確保它立即 "逃逸"
+                            if (denominator === 0) {
+                                return { x: 1e9, y: 1e9 }; // 返回一個極大的值
+                            }
+
+                            const invX = x / denominator;
+                            const invY = -y / denominator;
+
+                            // 加上常數 c
+                            const newX = invX + cReal;
+                            const newY = invY + cImag;
+
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'logistic-map': {
+                        name: 'c z(1-z) (邏輯斯蒂)',
+                        description: '邏輯斯蒂映射，混沌理論中的經典方程，產生被稱為\'Mandelbugs\'的獨特分形。',
+                        // 迭代公式: z_n+1 = c * z_n * (1 - z_n)
+                        calculate: (x, y, cReal, cImag) => {
+                            // 我們分兩步計算：
+                            // 1. 先計算 w = z * (1 - z)
+                            //    1 - z = (1 - x) - yi
+                            //    z * (1 - z) = (x + yi) * ((1 - x) - yi)
+                            const w_real = x * (1 - x) - y * (-y); // 實部: x(1-x) + y²
+                            const w_imag = x * (-y) + y * (1 - x); // 虛部: -xy + y(1-x)
+
+                            // 2. 再計算 c * w
+                            const newX = cReal * w_real - cImag * w_imag;
+                            const newY = cReal * w_imag + cImag * w_real;
+
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'z-sqrt': {
+                        name: 'c * √z (根号)',
+                        description: '平方根函數，常產生類似葉脈或閃電的有機分岔圖形。',
+                        // 迭代公式: z_n+1 = c * sqrt(z_n)
+                        calculate: (x, y, cReal, cImag) => {
+                            // 計算 z = x + yi 的主平方根 (結果為 u + vi)
+                            // 這裡使用直角坐標系公式以提高效率，避免三角函數的換算
+                            const r = Math.sqrt(x * x + y * y);
+                            const u = Math.sqrt((r + x) / 2);
+                            // v 的符號需要與 y 的符號保持一致，以確保是主平方根
+                            const v = (y < 0 ? -1 : 1) * Math.sqrt((r - x) / 2);
+
+                            // 執行複數乘法 c * (u + vi)
+                            const newX = cReal * u - cImag * v;
+                            const newY = cReal * v + cImag * u;
+
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'z-fourth': {
+                        name: 'z⁴ + c',
+                        description: '四次多項式，通常產生具有四重旋轉對稱性的圖形。',
+                        // 迭代公式: z_n+1 = z_n^4 + c
+                        calculate: (x, y, cReal, cImag) => {
+                            // 計算 z⁴ = (z²)²
+                            const z2_real = x * x - y * y;
+                            const z2_imag = 2 * x * y;
+
+                            const z4_real = z2_real * z2_real - z2_imag * z2_imag;
+                            const z4_imag = 2 * z2_real * z2_imag;
+
+                            // 加上常數 c
+                            const newX = z4_real + cReal;
+                            const newY = z4_imag + cImag;
+
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'z-fifth': {
+                        name: 'z⁵ + c',
+                        description: '五次多項式，通常產生具有五重旋轉對稱性的精美圖形。',
+                        // 迭代公式: z_n+1 = z_n^5 + c
+                        calculate: (x, y, cReal, cImag) => {
+                            // 計算 z⁵ = z⁴ * z
+                            const z2_real = x * x - y * y;
+                            const z2_imag = 2 * x * y;
+
+                            const z4_real = z2_real * z2_real - z2_imag * z2_imag;
+                            const z4_imag = 2 * z2_real * z2_imag;
+
+                            const z5_real = z4_real * x - z4_imag * y;
+                            const z5_imag = z4_real * y + z4_imag * x;
+
+                            // 加上常數 c
+                            const newX = z5_real + cReal;
+                            const newY = z5_imag + cImag;
+
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'exp-z': {
+                        name: 'c * e^z (指數)',
+                        description: '指數函數，產生具有週期性的獨特羽毛狀圖形。',
+                        // c * e^z = (cReal + cImag*i) * (e^x * (cos(y) + sin(y)i))
+                        calculate: (x, y, cReal, cImag) => {
+                            const expX = Math.exp(x);
+                            const cosY = Math.cos(y);
+                            const sinY = Math.sin(y);
+                            // 實部: cReal * expX * cosY - cImag * expX * sinY
+                            const newX = expX * (cReal * cosY - cImag * sinY);
+                            // 虛部: cReal * expX * sinY + cImag * expX * cosY
+                            const newY = expX * (cReal * sinY + cImag * cosY);
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'exp-z2': {
+                        name: 'c * e^(-z)',
+                        description: '指數函數，產生具有週期性的獨特羽毛狀圖形。',
+                        calculate: (x, y, cReal, cImag) => {
+                            const expX = Math.exp(-x);
+                            const cosY = Math.cos(-y);
+                            const sinY = Math.sin(-y);
+                            // 實部: cReal * expX * cosY - cImag * expX * sinY
+                            const newX = expX * (cReal * cosY - cImag * sinY);
+                            // 虛部: cReal * expX * sinY + cImag * expX * cosY
+                            const newY = expX * (cReal * sinY + cImag * cosY);
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'log-z': {
+                        name: 'c * Log(z) (對數)',
+                        description: '對數函數，由於其主分支特性，常產生帶狀或螺線形的結構。',
+                        // 迭代公式: z_n+1 = c * Log(z_n)
+                        calculate: (x, y, cReal, cImag) => {
+                            // 計算 z = x + yi 的主對數 (結果為 u + vi)
+                            // 數學公式: Log(z) = ln(|z|) + i * Arg(z)
+                            // |z| 是模長，Arg(z) 是輻角
+                            const r = Math.sqrt(x * x + y * y);
+
+                            // 處理 z=0 的特殊情況，因為 Log(0) 是未定義的 (趨向負無窮)
+                            if (r === 0) {
+                                return { x: 0, y: 0 }; // 直接返回一個穩定點以避免計算錯誤
+                            }
+
+                            const u = Math.log(r);      // u (新實部) 是模長的自然對數
+                            const v = Math.atan2(y, x); // v (新虛部) 是 z 的主輻角
+
+                            // 執行複數乘法 c * (u + vi)
+                            const newX = cReal * u - cImag * v;
+                            const newY = cReal * v + cImag * u;
+
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'sin-z': {
+                        name: 'c * sin(z) (正弦)',
+                        description: '正弦函數，常產生格子狀的重複結構或朦朧的霧狀圖案。',
+                        // 迭代公式: z_n+1 = c * sin(z_n)
+                        calculate: (x, y, cReal, cImag) => {
+                            // 計算複數正弦 sin(z)，其中 z = x + yi
+                            // 公式: sin(z) = sin(x)cosh(y) + i * cos(x)sinh(y)
+                            const sinX = Math.sin(x);
+                            const cosX = Math.cos(x);
+                            const sinhY = Math.sinh(y);
+                            const coshY = Math.cosh(y);
+
+                            const u = sinX * coshY; // sin(z) 的實部
+                            const v = cosX * sinhY; // sin(z) 的虛部
+
+                            // 執行複數乘法 c * (u + vi)
+                            const newX = cReal * u - cImag * v;
+                            const newY = cReal * v + cImag * u;
+
+                            return { x: newX, y: newY };
+                        }
+                    },
+                    'cos-z': {
+                        name: 'c * cos(z) (餘弦)',
+                        description: '三角函數，產生美麗的網格和重複結構。',
+                        // cos(z) = cos(x)cosh(y) - i * sin(x)sinh(y)
+                        calculate: (x, y, cReal, cImag) => {
+                            const cosX = Math.cos(x);
+                            const sinX = Math.sin(x);
+                            const coshY = Math.cosh(y);
+                            const sinhY = Math.sinh(y);
+                            const realPart = cosX * coshY;
+                            const imagPart = -sinX * sinhY;
+                            // 複數乘法 (c * cos(z))
+                            const newX = cReal * realPart - cImag * imagPart;
+                            const newY = cReal * imagPart + cImag * realPart;
+                            return { x: newX, y: newY };
+                        }
+                    }
+                };
+
+                this.iterationFn = this.ITERATION_FUNCTIONS['z-squared'];
+            }
+
+
             juliaIteration(zx, zy) {
                 let x = zx;
                 let y = zy;
@@ -414,10 +670,12 @@
                 let minDistance = Infinity;
                 let sumMagnitude = 0;
 
+                const currentIterFn = this.iterationFn.calculate;
+
                 while (x * x + y * y <= bailout && iteration < this.maxIterations) {
-                    const temp = x * x - y * y + this.cReal;
-                    y = 2 * x * y + this.cImag;
-                    x = temp;
+                    const nextPoint = currentIterFn(x, y, this.cReal, this.cImag);
+                    x = nextPoint.x;
+                    y = nextPoint.y;
                     iteration++;
 
                     // 轨道陷阱着色 - 记录到原点的最小距离
