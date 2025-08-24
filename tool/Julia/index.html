@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Julia集分形探索器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        #fractal-canvas {
+            display: block;
+            background: #000;
+        }
+
+        .controls {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #4fc3f7;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #b0b0b0;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 12px;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #4fc3f7;
+            box-shadow: 0 0 5px rgba(79, 195, 247, 0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px 0;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 195, 247, 0.3);
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+        .preset-buttons button {
+            font-size: 10px;
+            padding: 5px;
+        }
+
+        .status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .zoom-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+
+        /* 包裹 checkbox 和 label 的容器 */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+            /* 在選項和按鈕之間增加一些間距 */
+        }
+
+        /* 覆蓋 checkbox 的寬度，這是最關鍵的一步 */
+        .checkbox-wrapper input[type="checkbox"] {
+            width: auto;
+            /* 取消 width: 100%，讓它恢復原始大小 */
+            cursor: pointer;
+        }
+
+        /* 覆蓋 label 的樣式，讓它和 checkbox 在同一行 */
+        .checkbox-wrapper label {
+            display: inline;
+            /* 取消 display: block */
+            margin-bottom: 0;
+            /* 移除底部邊距 */
+            margin-left: 8px;
+            /* 在 checkbox 和文字之間增加一點間距 */
+            white-space: nowrap;
+            /* 防止文字換行 */
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="canvas-container">
+            <canvas id="fractal-canvas"></canvas>
+            <div class="status" id="status">计算中...</div>
+            <div class="zoom-info" id="zoom-info">缩放: 1x</div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <h3>Julia集参数</h3>
+                <div class="input-group">
+                    <label>实部 (C.real)</label>
+                    <input type="number" id="c-real" value="-0.75" step="0.01" min="-2" max="2">
+                </div>
+                <div class="input-group">
+                    <label>虚部 (C.imag)</label>
+                    <input type="number" id="c-imag" value="0.1" step="0.01" min="-2" max="2">
+                </div>
+                <button onclick="generateRandom()"
+                    style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); margin-top: 10px;">
+                    随机参数
+                </button>
+            </div>
+
+            <div class="control-group">
+                <h3>渲染参数</h3>
+                <div class="input-group">
+                    <label>最大迭代次数</label>
+                    <input type="number" id="max-iterations" value="200" min="50" max="2000">
+                </div>
+                <div class="input-group">
+                    <label>着色方案</label>
+                    <select id="color-scheme">
+                        <option value="rainbow">彩虹色</option>
+                        <option value="fire">火焰色</option>
+                        <option value="ocean">海洋色</option>
+                        <option value="electric">电子色</option>
+                        <option value="monochrome">单色</option>
+                        <option value="sunset">夕阳色</option>
+                    </select>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="smooth-coloring" checked>
+                    <label for="smooth-coloring">平滑着色</label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>预设Julia集</h3>
+                <div class="preset-buttons">
+                    <button onclick="loadPreset(-0.75, 0.1)">经典</button>
+                    <button onclick="loadPreset(-0.123, 0.745)">螺旋</button>
+                    <button onclick="loadPreset(0.285, 0.01)">叶子</button>
+                    <button onclick="loadPreset(-0.8, 0.156)">闪电</button>
+                    <button onclick="loadPreset(-0.4, 0.6)">花朵</button>
+                    <button onclick="loadPreset(0.3, 0.5)">兔子</button>
+                    <button onclick="loadPreset(-0.235, 0.827)">凤凰</button>
+                    <button onclick="loadPreset(0.45, 0.1428)">飞鸟</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>控制</h3>
+                <button onclick="render()">重新渲染</button>
+                <button onclick="resetView()">重置视图</button>
+                <button onclick="saveImage()">保存图像</button>
+            </div>
+
+            <div class="control-group">
+                <h3>操作说明</h3>
+                <p style="font-size: 11px; line-height: 1.4; color: #888;">
+                    • 点击放大<br>
+                    • Shift+点击缩小<br>
+                    • 拖拽移动视图<br>
+                    • 滚轮缩放<br>
+                    • 调整参数实时更新
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class JuliaFractalExplorer {
+            constructor() {
+                this.canvas = document.getElementById('fractal-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.status = document.getElementById('status');
+                this.zoomInfo = document.getElementById('zoom-info');
+
+                this.setupCanvas();
+                this.setupControls();
+                this.setupEventListeners();
+
+                // 视图参数
+                this.centerX = 0;
+                this.centerY = 0;
+                this.zoom = 1;
+                this.maxZoom = 1e15;
+
+                // Julia参数
+                this.cReal = -0.75;
+                this.cImag = 0.1;
+                this.maxIterations = 200;
+                this.colorScheme = 'rainbow';
+                this.smoothColoring = true;
+
+                this.isDragging = false;
+                this.dragStart = { x: 0, y: 0 };
+
+                this.render();
+            }
+
+            setupCanvas() {
+                const resizeCanvas = () => {
+                    const container = this.canvas.parentElement;
+                    this.canvas.width = container.clientWidth;
+                    this.canvas.height = container.clientHeight;
+                    this.render();
+                };
+
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
+            }
+
+            setupControls() {
+                const controls = {
+                    'c-real': (v) => { this.cReal = parseFloat(v); this.render(); },
+                    'c-imag': (v) => { this.cImag = parseFloat(v); this.render(); },
+                    'max-iterations': (v) => { this.maxIterations = parseInt(v); this.render(); },
+                    'color-scheme': (v) => { this.colorScheme = v; this.render(); },
+                    'smooth-coloring': (v) => { this.smoothColoring = v; this.render(); }
+                };
+
+                Object.keys(controls).forEach(id => {
+                    const element = document.getElementById(id);
+                    const handler = controls[id];
+
+                    if (element.type === 'checkbox') {
+                        element.addEventListener('change', () => handler(element.checked));
+                    } else {
+                        element.addEventListener('input', () => handler(element.value));
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // 鼠标点击缩放
+                this.canvas.addEventListener('click', (e) => {
+                    if (this.isDragging) return;
+
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const factor = e.shiftKey ? 0.5 : 2;
+                    this.zoomAt(x, y, factor);
+                });
+
+                // 鼠标拖拽
+                this.canvas.addEventListener('mousedown', (e) => {
+                    this.isDragging = false;
+                    this.dragStart.x = e.clientX;
+                    this.dragStart.y = e.clientY;
+                });
+
+                this.canvas.addEventListener('mousemove', (e) => {
+                    if (e.buttons === 1) {
+                        const dx = e.clientX - this.dragStart.x;
+                        const dy = e.clientY - this.dragStart.y;
+
+                        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+                            this.isDragging = true;
+                            const scale = 4 / (this.canvas.width * this.zoom);
+                            this.centerX -= dx * scale;
+                            this.centerY += dy * scale;
+
+                            this.dragStart.x = e.clientX;
+                            this.dragStart.y = e.clientY;
+                            this.render();
+                        }
+                    }
+                });
+
+                // 滚轮缩放
+                this.canvas.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const factor = e.deltaY > 0 ? 0.9 : 1.1;
+                    this.zoomAt(x, y, factor);
+                });
+            }
+
+            zoomAt(x, y, factor) {
+                if (this.zoom * factor > this.maxZoom) return;
+
+                // 将屏幕坐标转换为复数坐标
+                const scale = 4 / (this.canvas.width * this.zoom);
+                const complexX = this.centerX + (x - this.canvas.width / 2) * scale;
+                const complexY = this.centerY - (y - this.canvas.height / 2) * scale;
+
+                // 缩放
+                this.zoom *= factor;
+
+                // 调整中心点以保持缩放点不变
+                const newScale = 4 / (this.canvas.width * this.zoom);
+                this.centerX = complexX - (x - this.canvas.width / 2) * newScale;
+                this.centerY = complexY + (y - this.canvas.height / 2) * newScale;
+
+                this.updateZoomInfo();
+                this.render();
+            }
+
+            updateZoomInfo() {
+                let zoomStr;
+                if (this.zoom >= 1e9) {
+                    zoomStr = (this.zoom / 1e9).toFixed(1) + 'B';
+                } else if (this.zoom >= 1e6) {
+                    zoomStr = (this.zoom / 1e6).toFixed(1) + 'M';
+                } else if (this.zoom >= 1e3) {
+                    zoomStr = (this.zoom / 1e3).toFixed(1) + 'K';
+                } else {
+                    zoomStr = this.zoom.toFixed(1);
+                }
+                this.zoomInfo.textContent = `缩放: ${zoomStr}x`;
+            }
+
+            juliaIteration(zx, zy) {
+                let x = zx;
+                let y = zy;
+                let iteration = 0;
+                let bailout = 256;
+
+                // 记录轨道信息用于着色
+                let orbitTrap = Infinity;
+                let minDistance = Infinity;
+                let sumMagnitude = 0;
+
+                while (x * x + y * y <= bailout && iteration < this.maxIterations) {
+                    const temp = x * x - y * y + this.cReal;
+                    y = 2 * x * y + this.cImag;
+                    x = temp;
+                    iteration++;
+
+                    // 轨道陷阱着色 - 记录到原点的最小距离
+                    const dist = Math.sqrt(x * x + y * y);
+                    minDistance = Math.min(minDistance, dist);
+                    sumMagnitude += dist;
+
+                    // 记录轨道陷阱
+                    orbitTrap = Math.min(orbitTrap, Math.abs(x) + Math.abs(y));
+                }
+
+                // 返回多种信息用于着色
+                return {
+                    iterations: iteration,
+                    escaped: iteration < this.maxIterations,
+                    finalMagnitude: Math.sqrt(x * x + y * y),
+                    orbitTrap: orbitTrap,
+                    minDistance: minDistance,
+                    avgMagnitude: sumMagnitude / iteration,
+                    finalX: x,
+                    finalY: y
+                };
+            }
+
+            getColor(result) {
+                const { iterations, escaped, finalMagnitude, orbitTrap, minDistance, avgMagnitude } = result;
+
+                // 多层着色策略 - 即使是收敛点也有丰富的颜色
+                if (!escaped) {
+                    // 对于收敛点（Julia集内部），使用轨道信息着色
+                    return this.getInteriorColor(orbitTrap, minDistance, avgMagnitude, iterations);
+                } else {
+                    // 对于发散点，使用传统的逃逸时间着色
+                    let smoothIterations = iterations;
+                    if (this.smoothColoring) {
+                        const nu = Math.log(Math.log(finalMagnitude) / Math.log(Math.sqrt(256))) / Math.log(2);
+                        smoothIterations = iterations + 1 - nu;
+                    }
+                    return this.getExteriorColor(smoothIterations);
+                }
+            }
+
+            getInteriorColor(orbitTrap, minDistance, avgMagnitude, iterations) {
+                // 为Julia集内部创建丰富的颜色
+                const trapFactor = Math.min(1, orbitTrap / 2);
+                const distFactor = Math.min(1, minDistance / 10);
+                const avgFactor = Math.min(1, avgMagnitude / 20);
+                const iterFactor = iterations / this.maxIterations;
+
+                switch (this.colorScheme) {
+                    case 'rainbow':
+                        const hue = (trapFactor * 360 + distFactor * 180) % 360;
+                        const sat = 0.6 + avgFactor * 0.4;
+                        const light = 0.3 + iterFactor * 0.4;
+                        return this.hslToRgb(hue, sat, light);
+
+                    case 'fire':
+                        return [
+                            Math.min(255, 80 + trapFactor * 175),
+                            Math.min(255, 20 + distFactor * 150),
+                            Math.min(255, 5 + avgFactor * 100)
+                        ];
+
+                    case 'ocean':
+                        return [
+                            Math.min(255, 10 + trapFactor * 100),
+                            Math.min(255, 50 + distFactor * 150),
+                            Math.min(255, 100 + avgFactor * 155)
+                        ];
+
+                    case 'electric':
+                        return [
+                            Math.min(255, 20 + trapFactor * 150),
+                            Math.min(255, 30 + distFactor * 200),
+                            Math.min(255, 150 + avgFactor * 105)
+                        ];
+
+                    case 'monochrome':
+                        const intensity = 50 + (trapFactor + distFactor + avgFactor) * 70;
+                        return [intensity, intensity, intensity];
+
+                    case 'sunset':
+                        return [
+                            Math.min(255, 100 + trapFactor * 155),
+                            Math.min(255, 50 + distFactor * 120),
+                            Math.min(255, 20 + avgFactor * 80)
+                        ];
+
+                    default:
+                        return [80, 40, 120]; // 默认深紫色
+                }
+            }
+
+            getExteriorColor(smoothIterations) {
+                // 增强对比度和饱和度的着色
+                const t = Math.min(1, smoothIterations / (this.maxIterations * 0.8));
+
+                switch (this.colorScheme) {
+                    case 'rainbow':
+                        return this.rainbowColor(t);
+                    case 'fire':
+                        return this.fireColor(t);
+                    case 'ocean':
+                        return this.oceanColor(t);
+                    case 'electric':
+                        return this.electricColor(t);
+                    case 'monochrome':
+                        return this.monochromeColor(t);
+                    case 'sunset':
+                        return this.sunsetColor(t);
+                    default:
+                        return this.rainbowColor(t);
+                }
+            }
+
+            hslToRgb(h, s, l) {
+                h /= 360;
+                const c = (1 - Math.abs(2 * l - 1)) * s;
+                const x = c * (1 - Math.abs((h * 6) % 2 - 1));
+                const m = l - c / 2;
+
+                let r, g, b;
+                if (h < 1 / 6) [r, g, b] = [c, x, 0];
+                else if (h < 2 / 6) [r, g, b] = [x, c, 0];
+                else if (h < 3 / 6) [r, g, b] = [0, c, x];
+                else if (h < 4 / 6) [r, g, b] = [0, x, c];
+                else if (h < 5 / 6) [r, g, b] = [x, 0, c];
+                else[r, g, b] = [c, 0, x];
+
+                return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+            }
+
+            rainbowColor(t) {
+                // 增强的彩虹色，更高饱和度和亮度
+                const frequency = 6; // 增加频率获得更多色彩变化
+                const r = Math.sin(frequency * t * Math.PI) * 127 + 128;
+                const g = Math.sin(frequency * t * Math.PI + 2) * 127 + 128;
+                const b = Math.sin(frequency * t * Math.PI + 4) * 127 + 128;
+
+                // 增加亮度
+                const boost = 1.2;
+                return [Math.min(255, r * boost), Math.min(255, g * boost), Math.min(255, b * boost)];
+            }
+
+            fireColor(t) {
+                // 更丰富的火焰色阶
+                const r = Math.min(255, Math.pow(t, 0.4) * 255);
+                const g = Math.max(50, Math.min(255, Math.pow(Math.max(0, t - 0.2), 0.8) * 255));
+                const b = Math.max(20, Math.min(255, Math.pow(Math.max(0, t - 0.6), 1.2) * 255));
+                return [r, g, b];
+            }
+
+            oceanColor(t) {
+                // 更鲜艳的海洋色
+                const r = Math.max(30, Math.min(255, Math.pow(Math.max(0, t - 0.3), 1.5) * 255));
+                const g = Math.min(255, 100 + Math.pow(t, 0.7) * 155);
+                const b = Math.min(255, 150 + Math.pow(t, 0.5) * 105);
+                return [r, g, b];
+            }
+
+            electricColor(t) {
+                // 更炫酷的电子色
+                const pulse = Math.sin(t * Math.PI * 8) * 0.3 + 0.7; // 添加脉冲效果
+                const r = t < 0.3 ? 20 : Math.pow((t - 0.3) / 0.7, 0.5) * 255;
+                const g = Math.pow(Math.sin(t * Math.PI), 2) * 255;
+                const b = Math.min(255, (255 - t * 100) * pulse);
+                return [r, g, b];
+            }
+
+            monochromeColor(t) {
+                // 更有层次的单色
+                const intensity = 50 + Math.pow(t, 0.6) * 205; // 避免纯黑色
+                const variation = Math.sin(t * Math.PI * 4) * 20; // 添加细微变化
+                const final = Math.min(255, Math.max(50, intensity + variation));
+                return [final, final, final];
+            }
+
+            sunsetColor(t) {
+                // 更温暖的夕阳色
+                const r = Math.min(255, 150 + Math.pow(t, 0.4) * 105);
+                const g = Math.max(40, Math.min(255, 80 + Math.pow(t, 0.8) * 175));
+                const b = Math.max(20, Math.min(255, 30 + Math.pow(t, 1.5) * 100));
+                return [r, g, b];
+            }
+
+            async render() {
+                this.status.textContent = '计算中...';
+
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+
+                // 创建离屏Canvas避免闪烁
+                const offscreenCanvas = document.createElement('canvas');
+                offscreenCanvas.width = width;
+                offscreenCanvas.height = height;
+                const offscreenCtx = offscreenCanvas.getContext('2d');
+                const imageData = offscreenCtx.createImageData(width, height);
+                const data = imageData.data;
+
+                const scale = 4 / (width * this.zoom);
+
+                // 使用requestAnimationFrame进行分批渲染
+                let currentRow = 0;
+                const batchSize = 10; // 每批处理10行
+
+                const renderBatch = () => {
+                    const endRow = Math.min(currentRow + batchSize, height);
+
+                    for (let y = currentRow; y < endRow; y++) {
+                        for (let x = 0; x < width; x++) {
+                            const zx = this.centerX + (x - width / 2) * scale;
+                            const zy = this.centerY - (y - height / 2) * scale;
+
+                            const result = this.juliaIteration(zx, zy);
+                            const color = this.getColor(result);
+
+                            const index = (y * width + x) * 4;
+                            data[index] = color[0];
+                            data[index + 1] = color[1];
+                            data[index + 2] = color[2];
+                            data[index + 3] = 255;
+                        }
+                    }
+
+                    currentRow = endRow;
+
+                    // 更新进度
+                    const progress = Math.floor((currentRow / height) * 100);
+                    this.status.textContent = `计算中... ${progress}%`;
+
+                    if (currentRow < height) {
+                        // 继续下一批
+                        requestAnimationFrame(renderBatch);
+                    } else {
+                        // 渲染完成，一次性绘制到主Canvas
+                        offscreenCtx.putImageData(imageData, 0, 0);
+                        this.ctx.clearRect(0, 0, width, height);
+                        this.ctx.drawImage(offscreenCanvas, 0, 0);
+
+                        this.status.textContent = '渲染完成';
+                        setTimeout(() => {
+                            this.status.textContent = '';
+                        }, 2000);
+                    }
+                };
+
+                // 开始渲染
+                requestAnimationFrame(renderBatch);
+            }
+
+            async renderChunk(startY, endY, width, scale) {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        const chunk = [];
+
+                        for (let y = startY; y < endY; y++) {
+                            const row = [];
+                            for (let x = 0; x < width; x++) {
+                                const zx = this.centerX + (x - width / 2) * scale;
+                                const zy = this.centerY - (y - this.canvas.height / 2) * scale;
+
+                                const iteration = this.juliaIteration(zx, zy);
+                                const color = this.getColor(iteration);
+                                row.push(color);
+                            }
+                            chunk.push(row);
+                        }
+
+                        resolve(chunk);
+                    }, 0);
+                });
+            }
+
+            loadPreset(real, imag) {
+                this.cReal = real;
+                this.cImag = imag;
+                document.getElementById('c-real').value = real;
+                document.getElementById('c-imag').value = imag;
+                this.render();
+            }
+
+            generateRandom() {
+                // 生成在合理范围内的随机Julia集参数
+                // 大多数有趣的Julia集都在单位圆附近
+                const methods = ['uniform', 'circular', 'mandelbrot', 'golden'];
+                const method = methods[Math.floor(Math.random() * methods.length)];
+
+                let real, imag;
+
+                switch (method) {
+                    case 'uniform':
+                        // 均匀分布在 [-1.5, 1.5] 范围内
+                        real = (Math.random() - 0.5) * 3;
+                        imag = (Math.random() - 0.5) * 3;
+                        break;
+
+                    case 'circular':
+                        // 在单位圆内生成，大多数有趣的Julia集都在这里
+                        const angle = Math.random() * 2 * Math.PI;
+                        const radius = Math.random() * 1.2;
+                        real = radius * Math.cos(angle);
+                        imag = radius * Math.sin(angle);
+                        break;
+
+                    case 'mandelbrot':
+                        // 从Mandelbrot集边界附近选择点
+                        const mandelbrotPoints = [
+                            [-0.8, 0.156], [-0.75, 0.1], [-0.123, 0.745],
+                            [0.285, 0.01], [-0.4, 0.6], [0.3, 0.5],
+                            [-0.235, 0.827], [0.45, 0.1428], [-0.62772, 0.42193],
+                            [-0.79269, 0.15195], [0.11031, -0.67037]
+                        ];
+                        const basePoint = mandelbrotPoints[Math.floor(Math.random() * mandelbrotPoints.length)];
+                        // 在基点附近添加小的随机偏移
+                        real = basePoint[0] + (Math.random() - 0.5) * 0.2;
+                        imag = basePoint[1] + (Math.random() - 0.5) * 0.2;
+                        break;
+
+                    case 'golden':
+                        // 使用黄金比例生成有趣的参数
+                        const phi = (1 + Math.sqrt(5)) / 2;
+                        const t = Math.random() * 2 * Math.PI;
+                        real = Math.cos(t) / phi;
+                        imag = Math.sin(t) / phi;
+                        break;
+                }
+
+                // 确保参数在合理范围内
+                real = Math.max(-2, Math.min(2, real));
+                imag = Math.max(-2, Math.min(2, imag));
+
+                // 四舍五入到三位小数
+                real = Math.round(real * 1000) / 1000;
+                imag = Math.round(imag * 1000) / 1000;
+
+                this.loadPreset(real, imag);
+
+                // 显示生成的参数类型
+                this.status.textContent = `随机参数 (${method}): ${real} + ${imag}i`;
+                setTimeout(() => {
+                    if (this.status.textContent.includes('随机参数')) {
+                        this.status.textContent = '';
+                    }
+                }, 3000);
+            }
+
+            resetView() {
+                this.centerX = 0;
+                this.centerY = 0;
+                this.zoom = 1;
+                this.updateZoomInfo();
+                this.render();
+            }
+
+            saveImage() {
+                const link = document.createElement('a');
+                link.download = `julia-fractal-${Date.now()}.png`;
+                link.href = this.canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        // 全局函数
+        let fractalExplorer;
+
+        function loadPreset(real, imag) {
+            fractalExplorer.loadPreset(real, imag);
+        }
+
+        function render() {
+            fractalExplorer.render();
+        }
+
+        function resetView() {
+            fractalExplorer.resetView();
+        }
+
+        function generateRandom() {
+            fractalExplorer.generateRandom();
+        }
+
+        function saveImage() {
+            fractalExplorer.saveImage();
+        }
+
+        // 初始化
+        window.addEventListener('load', () => {
+            fractalExplorer = new JuliaFractalExplorer();
+        });
+    </script>
+</body>
+
+</html>
