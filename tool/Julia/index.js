@@ -829,9 +829,12 @@ class JuliaFractalExplorer {
         });
     }
 
-    loadPreset(real, imag) {
+    loadPreset(real, imag, resetFunction = false) {
 
-        this.setIterationFunction('z-squared');
+        if (resetFunction) {
+            this.setIterationFunction('z-squared');
+        }
+        
         this.cReal = real;
         this.cImag = imag;
         document.getElementById('c-real').value = real;
@@ -893,7 +896,7 @@ class JuliaFractalExplorer {
         real = Math.round(real * 1000) / 1000;
         imag = Math.round(imag * 1000) / 1000;
 
-        this.loadPreset(real, imag);
+        this.loadPreset(real, imag, false);
 
         // 显示生成的参数类型
         this.status.textContent = `随机参数 (${method}): ${real} + ${imag}i`;
@@ -924,7 +927,7 @@ class JuliaFractalExplorer {
 let fractalExplorer;
 
 function loadPreset(real, imag) {
-    fractalExplorer.loadPreset(real, imag);
+    fractalExplorer.loadPreset(real, imag, true);
 }
 
 function render() {
