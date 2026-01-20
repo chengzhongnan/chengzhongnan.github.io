@@ -3,315 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>纯HTML视频合并工具 (ffmpeg.wasm)</title>
+    <title>本地版视频合并工具 (ffmpeg.wasm)</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            padding: 30px;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        h1 { margin-top: 0; color: #2c3e50; }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        button:hover { background-color: #2980b9; }
-        button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        .step-block {
-            margin-bottom: 25px;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 6px;
-        }
-        .status-ready { color: #27ae60; font-weight: bold; margin-left: 10px; }
-        input[type="file"] {
-            padding: 10px;
-            border: 1px dashed #ccc;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        /* Loading Spinner */
-        .loading-container {
-            display: none; /* 默认隐藏 */
-            text-align: center;
-            margin: 20px 0;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* Logs and Result */
-        .log-container {
-            margin-top: 20px;
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 6px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-        }
-        #logContent { white-space: pre-wrap; word-break: break-all; margin: 0; }
-        #resultArea { display: none; margin-top: 20px; text-align: center; }
-        video { max-width: 100%; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .download-btn { display: inline-block; margin-top: 15px; text-decoration: none; background: #27ae60; padding: 10px 20px; color: white; border-radius: 4px;}
+        body { font-family: 'Segoe UI', sans-serif; padding: 30px; background-color: #f5f5f5; max-width: 800px; margin: 0 auto; }
+        .container { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        button { padding: 10px 20px; cursor: pointer; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 16px; margin-right: 10px;}
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        input[type="file"] { margin: 15px 0; display: block; width: 100%; padding: 10px; border: 1px dashed #ccc; }
+        .log-box { margin-top: 20px; background: #2c3e50; color: #ecf0f1; padding: 15px; height: 250px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap; border-radius: 4px;}
+        #resultArea { display: none; margin-top: 20px; text-align: center; border: 2px solid #27ae60; padding: 10px; border-radius: 4px;}
+        video { max-width: 100%; margin-top: 10px; }
+        .download-btn { display: inline-block; margin-top: 10px; text-decoration: none; background: #27ae60; padding: 8px 20px; color: white; border-radius: 4px;}
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>📺 纯HTML视频合并工具 (ffmpeg.wasm)</h1>
-    <p style="color: #666;">注意：此方法使用 "流复制" 模式，要求所有输入视频必须具有<b>相同的分辨率、编码格式和帧率</b>，否则合并后的视频可能无法播放或花屏。</p>
+    <h1>📂 本地离线版视频合并</h1>
+    <p style="color: #666; font-size: 0.9em;">请确保 ffmpeg-core.wasm, ffmpeg-core.js, ffmpeg.mjs, util.mjs 都在当前目录下。</p>
 
-    <div class="step-block" id="step1Container">
-        <h3>第一步：初始化引擎</h3>
-        <button id="loadBtn">点击加载 FFmpeg 核心 (~30MB)</button>
-        <span id="loadStatus"></span>
+    <div id="step1">
+        <button id="loadBtn">1. 加载本地引擎</button>
+        <span id="loadStatus">🔴 未加载</span>
     </div>
 
-    <div class="step-block" id="step2Container" style="opacity: 0.5; pointer-events: none;">
-        <h3>第二步：选择视频并合并</h3>
-        <p>请按期望的播放顺序选择两个或以上的文件（按住 Ctrl 或 Shift 多选）。</p>
-        <input type="file" id="fileInput" multiple accept="video/mp4,video/webm,video/mov">
-        <br><br>
-        <button id="mergeBtn" disabled>开始合并视频</button>
+    <div id="step2" style="opacity: 0.5; pointer-events: none; margin-top: 20px;">
+        <h3>2. 选择视频并合并</h3>
+        <input type="file" id="fileInput" multiple accept="video/*">
+        <button id="mergeBtn" disabled>开始合并</button>
     </div>
 
-    <div class="loading-container" id="loadingBox">
-        <div class="spinner"></div>
-        <p id="loadingText">正在处理中，请勿关闭页面...</p>
+    <div id="resultArea">
+        <h3 style="color: #27ae60;">合并成功！</h3>
+        <video id="outputVideo" controls></video><br>
+        <a id="downloadLink" class="download-btn" download="merged_local.mp4">下载视频</a>
     </div>
 
-    <div id="resultArea" class="step-block" style="border-color: #27ae60;">
-        <h3 style="color: #27ae60;">🎉 合并成功！</h3>
-        <video id="outputVideo" controls></video>
-        <br>
-        <a id="downloadLink" class="download-btn" download="merged_video.mp4">⬇️ 下载合并后的视频</a>
-    </div>
-
-    <div class="log-container">
-        <div style="margin-bottom: 5px; font-weight: bold;">运行日志:</div>
-        <pre id="logContent"></pre>
-    </div>
+    <div class="log-box" id="logContent"></div>
 </div>
 
-
 <script type="module">
-    // 从 CDN 导入 FFmpeg 类和工具函数
-    import { FFmpeg } from 'https://esm.sh/@ffmpeg/ffmpeg@0.12.10';
-    import { fetchFile, toBlobURL } from 'https://esm.sh/@ffmpeg/util@0.12.1';
+    // ⬇️ 修改点 1：引用本地文件
+    import { FFmpeg } from './ffmpeg.mjs';
+    import { fetchFile, toBlobURL } from './util.mjs';
 
-    // --- DOM 元素引用 ---
     const loadBtn = document.getElementById('loadBtn');
     const loadStatus = document.getElementById('loadStatus');
-    const step2Container = document.getElementById('step2Container');
+    const step2 = document.getElementById('step2');
     const fileInput = document.getElementById('fileInput');
     const mergeBtn = document.getElementById('mergeBtn');
-    const loadingBox = document.getElementById('loadingBox');
-    const loadingText = document.getElementById('loadingText');
+    const logContent = document.getElementById('logContent');
     const resultArea = document.getElementById('resultArea');
     const outputVideo = document.getElementById('outputVideo');
     const downloadLink = document.getElementById('downloadLink');
-    const logContent = document.getElementById('logContent');
 
     let ffmpeg = null;
-    let isCoreLoaded = false;
 
-    // --- 工具函数 ---
-    
-    // 添加日志到界面
-    const addLog = (message) => {
-        const time = new Date().toLocaleTimeString();
-        logContent.textContent += `[${time}] ${message}\n`;
-        // 自动滚动到底部
-        logContent.parentElement.scrollTop = logContent.parentElement.scrollHeight;
+    const addLog = (msg) => {
+        logContent.textContent += `> ${msg}\n`;
+        logContent.scrollTop = logContent.scrollHeight;
     };
 
-    // 切换加载状态显示
-    const setLoadingState = (isLoading, text = "处理中...") => {
-        loadingBox.style.display = isLoading ? 'block' : 'none';
-        loadingText.textContent = text;
-        // 禁用/启用交互按钮
-        fileInput.disabled = isLoading;
-        mergeBtn.disabled = isLoading || fileInput.files.length < 2;
-    };
-
-    // --- 核心逻辑 ---
-
-    // 1. 加载 FFmpeg 核心 (WASM 文件)
-    const loadFFmpegCore = async () => {
-        if (isCoreLoaded) return;
-        
+    // --- 加载核心 ---
+    loadBtn.addEventListener('click', async () => {
         loadBtn.disabled = true;
-        setLoadingState(true, "正在下载并初始化 WASM 核心，请耐心等待...");
+        addLog("正在加载本地核心文件...");
         
         try {
             ffmpeg = new FFmpeg();
-            // 绑定日志回调，FFmpeg 的内部输出会打印在这里
-            ffmpeg.on('log', ({ message }) => {
-               // 过滤掉一些太频繁的日志，只保留关键信息
-               if(message.startsWith('frame=') || message.startsWith('size=')) return;
-               addLog(`[FFmpeg] ${message}`);
-            });
-
-            addLog("开始加载核心...");
-            // 使用 esm.sh 的 CDN 地址
-            const baseURL = 'https://esm.sh/@ffmpeg/core@0.12.10/dist/umd';
-            await ffmpeg.load({
-                // 使用 toBlobURL 可以避免一些跨域 (CORS) 问题
-                coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-                wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-            });
-
-            isCoreLoaded = true;
-            loadStatus.innerHTML = '<span class="status-ready">✅ 核心加载完成，请继续下一步</span>';
-            loadBtn.style.display = 'none'; // 隐藏加载按钮
-            // 激活第二步区域
-            step2Container.style.opacity = '1';
-            step2Container.style.pointerEvents = 'auto';
-            addLog("核心初始化成功！");
-
-        } catch (error) {
-            addLog(`❌ 加载失败: ${error.message}`);
-            alert("FFmpeg核心加载失败，请检查网络连接或查看下方日志。");
-            loadBtn.disabled = false;
-        } finally {
-            setLoadingState(false);
-        }
-    };
-
-    // 2. 执行视频合并
-    const startMerge = async () => {
-        const files = fileInput.files;
-        if (files.length < 2) {
-            alert("请至少选择两个视频文件进行合并。");
-            return;
-        }
-
-        setLoadingState(true, "正在读取文件并执行合并，请稍候...");
-        resultArea.style.display = 'none'; // 隐藏旧的结果
-        
-        // 如果之前有生成的视频URL，释放内存
-        if (outputVideo.src) {
-            URL.revokeObjectURL(outputVideo.src);
-            outputVideo.src = '';
-        }
-
-        try {
-            addLog("--- 开始新的合并任务 ---");
-            const inputNames = [];
-
-            // A. 将用户选择的文件写入 WASM 的虚拟内存文件系统 (MEMFS)
-            addLog("正在将文件写入内存文件系统...");
-            for (let i = 0; i < files.length; i++) {
-                // 为了安全和简便，我们将输入文件重命名为 input_0.mp4, input_1.mp4 等
-                // 假设输入都是 mp4，实际上 ffmpeg 可以自动识别，但后缀名有助于它判断
-                const safeName = `input_${i}.mp4`; 
-                addLog(`-> 读取并写入: ${files[i].name} 重命名为 ${safeName}`);
-                // fetchFile 可以将 File 对象转为 Uint8Array
-                const fileData = await fetchFile(files[i]);
-                // 写入虚拟文件系统
-                await ffmpeg.writeFile(safeName, fileData);
-                inputNames.push(safeName);
-            }
-
-            // B. 创建 concat 所需的列表文件 (list.txt)
-            // 文件内容格式类似于: file 'input_0.mp4' \n file 'input_1.mp4'
-            const listContent = inputNames.map(name => `file '${name}'`).join('\n');
-            await ffmpeg.writeFile('concat_list.txt', listContent);
-            addLog(`已创建合并列表文件 (concat_list.txt)`);
-
-            // C. 执行 FFmpeg 命令
-            // -f concat: 使用拼接解复用器
-            // -safe 0: 允许读取相对路径
-            // -i concat_list.txt: 输入的列表文件
-            // -c copy: 核心参数！表示直接复制流，不重新编码。速度极快，但要求源文件参数一致。
-            addLog("🚀 正在执行 FFmpeg 合并命令...");
-            const command = ['-f', 'concat', '-safe', '0', '-i', 'concat_list.txt', '-c', 'copy', 'output.mp4'];
-            addLog(`执行命令: ffmpeg ${command.join(' ')}`);
             
-            // exec 是一个异步操作，等待它完成
-            await ffmpeg.exec(command);
+            ffmpeg.on('log', ({ message }) => {
+                if(!message.includes('frame=')) addLog(message);
+            });
 
-            addLog("命令执行完毕，正在读取输出文件...");
+            // ⬇️ 修改点 2：显式指向本地的 core.js 和 core.wasm
+            // 使用 toBlobURL 可以让浏览器认为文件是同源的，避免部分跨域问题
+            await ffmpeg.load({
+                coreURL: await toBlobURL('./ffmpeg-core.js', 'text/javascript'),
+                wasmURL: await toBlobURL('./ffmpeg-core.wasm', 'application/wasm'),
+            });
 
-            // D. 读取输出文件并生成浏览器可用的 URL
-            // readFile 返回的是 Uint8Array
-            const data = await ffmpeg.readFile('output.mp4');
-            // 创建 Blob
-            const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-            // 创建 Object URL
-            const videoUrl = URL.createObjectURL(videoBlob);
-
-            // 更新 UI 显示结果
-            outputVideo.src = videoUrl;
-            downloadLink.href = videoUrl;
-            resultArea.style.display = 'block';
-            addLog("✨ 合并成功！结果已显示在上方。");
-
-            // E. (可选) 清理内存中的临时文件
-            addLog("清理临时文件...");
-            await ffmpeg.deleteFile('concat_list.txt');
-            // await ffmpeg.deleteFile('output.mp4'); // 输出文件先留着，如果用户再次点击合并会覆盖
-            for (const name of inputNames) {
-                await ffmpeg.deleteFile(name);
-            }
+            loadStatus.textContent = "✅ 已加载";
+            loadStatus.style.color = "green";
+            loadBtn.style.display = 'none';
+            step2.style.opacity = '1';
+            step2.style.pointerEvents = 'auto';
+            addLog("核心加载成功！完全运行在本地模式。");
 
         } catch (error) {
             console.error(error);
-            addLog(`❌ 合并过程中出错: ${error.message}`);
-            alert(`合并失败。\n\n可能原因：\n1.视频文件的分辨率或编码不一致（流复制模式要求严格一致）。\n2.浏览器内存不足。\n\n请查看下方日志详情。`);
-        } finally {
-            setLoadingState(false);
-        }
-    };
-
-    // --- 事件监听 ---
-
-    // 点击加载按钮
-    loadBtn.addEventListener('click', loadFFmpegCore);
-
-    // 监听文件选择变化，启用/禁用合并按钮
-    fileInput.addEventListener('change', () => {
-        const count = fileInput.files.length;
-        addLog(`已选择 ${count} 个文件`);
-        mergeBtn.disabled = count < 2;
-        if (count > 0 && count < 2) {
-            addLog("提示: 需要至少两个文件才能合并。");
+            addLog(`❌ 加载失败: ${error.message}`);
+            addLog("提示: 请确保你正在使用 http://localhost 访问此页面，而不是 file://");
+            loadBtn.disabled = false;
         }
     });
 
-    // 点击合并按钮
-    mergeBtn.addEventListener('click', startMerge);
+    // --- 监听文件选择 ---
+    fileInput.addEventListener('change', () => {
+        mergeBtn.disabled = fileInput.files.length < 2;
+        addLog(`已选择 ${fileInput.files.length} 个文件`);
+    });
 
-    addLog("就绪。请点击上方按钮加载引擎。");
+    // --- 执行合并 ---
+    mergeBtn.addEventListener('click', async () => {
+        if (fileInput.files.length < 2) return;
+        
+        mergeBtn.disabled = true;
+        mergeBtn.textContent = "处理中...";
+        resultArea.style.display = 'none';
+        
+        try {
+            const files = fileInput.files;
+            const inputNames = [];
 
+            // 1. 写入文件
+            for (let i = 0; i < files.length; i++) {
+                const safeName = `input_${i}.mp4`;
+                addLog(`读取并写入: ${safeName}`);
+                await ffmpeg.writeFile(safeName, await fetchFile(files[i]));
+                inputNames.push(safeName);
+            }
+
+            // 2. 创建列表
+            const listContent = inputNames.map(name => `file '${name}'`).join('\n');
+            await ffmpeg.writeFile('list.txt', listContent);
+
+            // 3. 运行命令 (流复制)
+            addLog("开始执行合并 (concat mode)...");
+            await ffmpeg.exec(['-f', 'concat', '-safe', '0', '-i', 'list.txt', '-c', 'copy', 'output.mp4']);
+
+            // 4. 读取结果
+            addLog("读取输出文件...");
+            const data = await ffmpeg.readFile('output.mp4');
+            const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+
+            outputVideo.src = url;
+            downloadLink.href = url;
+            resultArea.style.display = 'block';
+            addLog("✨ 全部完成！");
+
+            // 清理
+            await ffmpeg.deleteFile('list.txt');
+            await ffmpeg.deleteFile('output.mp4');
+            for (const name of inputNames) await ffmpeg.deleteFile(name);
+
+        } catch (error) {
+            addLog(`❌ 出错: ${error.message}`);
+        } finally {
+            mergeBtn.disabled = false;
+            mergeBtn.textContent = "开始合并";
+        }
+    });
 </script>
 
 </body>
