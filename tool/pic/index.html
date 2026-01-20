@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全能图片/Base64 转换工具 (支持大图预览)</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        h2 { margin-top: 0; text-align: center; color: #444; margin-bottom: 20px; }
+
+        /* 输入区域样式 */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        textarea.source-input {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        textarea.source-input:focus { outline: none; border-color: var(--primary-color); }
+
+        .file-upload-row { display: flex; align-items: center; gap: 15px; }
+
+        .divider {
+            display: flex; align-items: center; text-align: center; color: #999; font-size: 0.9em; margin: 5px 0;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+
+        /* 按钮组 */
+        .btn-group { display: flex; gap: 10px; }
+        button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; font-size: 14px; }
+        .btn-primary { background-color: var(--primary-color); color: white; flex: 2; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-file { background-color: #17a2b8; color: white; position: relative; overflow: hidden; }
+        .btn-file input[type=file] { position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%; font-size: 100px; text-align: right; filter: alpha(opacity=0); opacity: 0; outline: none; background: white; cursor: inherit; display: block; }
+        .btn-file:hover { background-color: #138496; }
+        .btn-clear { background-color: var(--secondary-color); color: white; }
+        .btn-clear:hover { background-color: #545b62; }
+
+        /* 错误提示 */
+        .msg-box { padding: 12px; border-radius: 6px; margin-bottom: 20px; display: none; font-size: 14px; line-height: 1.5; }
+        .msg-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .msg-warn { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+
+        /* 结果显示区域 */
+        #result-area { display: none; border-top: 2px dashed #eee; padding-top: 25px; animation: slideDown 0.4s ease-out; }
+        .result-grid { display: grid; grid-template-columns: 1fr 300px; gap: 25px; }
+        @media (max-width: 768px) { .result-grid { grid-template-columns: 1fr; } }
+
+        /* 图片预览容器 - 增加放大提示 */
+        .preview-box {
+            background: repeating-conic-gradient(#f9f9f9 0% 25%, transparent 0% 50%) 50% / 20px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 200px; max-height: 500px; overflow: hidden;
+            position: relative;
+        }
+
+        /* 预览图片本身样式 - 增加可点击手势 */
+        img#preview-img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: zoom-in; /* 鼠标悬停显示放大镜 */
+            transition: transform 0.2s;
+        }
+        img#preview-img:hover {
+            transform: scale(1.02);
+        }
+
+        /* 元信息列表 */
+        .meta-list { background: #f8f9fa; border-radius: 8px; padding: 20px; }
+        .meta-item { margin-bottom: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 10px; }
+        .meta-item:last-child { border-bottom: none; }
+        .meta-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+        .meta-value { font-size: 15px; font-weight: 700; color: #333; word-break: break-all; }
+
+        /* DataURL 输出框 */
+        .code-output-section { margin-top: 25px; }
+        .code-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .code-header label { font-weight: bold; font-size: 14px; }
+        textarea.code-output { width: 100%; height: 100px; padding: 10px; background: #2d2d2d; color: #66d9ef; border: 1px solid #444; border-radius: 6px; font-family: Consolas, monospace; font-size: 12px; resize: none; box-sizing: border-box; }
+        .btn-copy { padding: 4px 12px; font-size: 12px; background: #e2e6ea; color: #333; }
+        .btn-copy:hover { background: #dbe0e5; }
+        .btn-download { display: block; width: 100%; text-align: center; background-color: var(--success-color); color: white; text-decoration: none; padding: 12px 0; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+        .btn-download:hover { background-color: #218838; }
+        
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================
+           Modal (大图预览层) 样式
+        ========================================= */
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed; 
+            z-index: 1000; /* 置于顶层 */
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background-color: rgba(0,0,0,0.85); /* 半透明黑色背景 */
+            
+            /* 使用 Flex 布局居中显示图片 */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.3s;
+            backdrop-filter: blur(5px); /* 背景模糊效果 */
+        }
+
+        /* Modal 中的图片容器 */
+        .modal-content {
+            max-width: 95vw; /* 最大宽度为视口宽度的 95% */
+            max-height: 95vh; /* 最大高度为视口高度的 95% */
+            object-fit: contain; /* 关键：保持图片原始比例，不拉伸 */
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        /* 关闭按钮 (X) */
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            z-index: 1001;
+            cursor: pointer;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            transform: scale(1.1);
+        }
+        
+        @keyframes fadeIn { from {opacity: 0} to {opacity: 1} }
+        @keyframes zoomIn { from {transform: scale(0.9)} to {transform: scale(1)} }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>全能图片解析工具</h2>
+    
+    <div class="input-section">
+        <textarea id="data-input" class="source-input" placeholder="粘贴 Data URL、Base64 字符串，或者以 http/https 开头的图片链接..."></textarea>
+        
+        <div class="divider">或者</div>
+
+        <div class="file-upload-row">
+            <button class="btn-file">
+                📁 选择本地图片文件
+                <input type="file" id="file-input" accept="image/*">
+            </button>
+            <span id="file-name-display" style="color:#666; font-size:14px;"></span>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-primary" onclick="processInput()">解析并显示</button>
+            <button class="btn-clear" onclick="clearAll()">清空</button>
+        </div>
+    </div>
+
+    <div id="msg-box" class="msg-box"></div>
+
+    <div id="result-area">
+        <div class="result-grid">
+            <div class="preview-box" title="点击查看大图">
+                <img id="preview-img" alt="图片预览">
+            </div>
+
+            <div class="meta-list">
+                <div class="meta-item">
+                    <span class="meta-label">MIME 类型</span>
+                    <span class="meta-value" id="meta-type">-</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">原始尺寸</span>
+                    <span class="meta-value" id="meta-dims">-</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">文件大小 (估算)</span>
+                    <span class="meta-value" id="meta-size">-</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">数据来源</span>
+                    <span class="meta-value" id="meta-source">-</span>
+                </div>
+
+                <a id="download-link" class="btn-download" href="#" download="image.png">下载图片</a>
+            </div>
+        </div>
+
+        <div class="code-output-section">
+            <div class="code-header">
+                <label>DataURL (Base64)</label>
+                <button class="btn-copy" onclick="copyDataUrl()">复制 DataURL</button>
+            </div>
+            <textarea id="dataurl-output" class="code-output" readonly></textarea>
+        </div>
+    </div>
+</div>
+
+<div id="imageModal" class="modal">
+  <span class="close" onclick="closeModal()">&times;</span>
+  <img class="modal-content" id="modal-image">
+</div>
+
+<script>
+    // --- 核心变量 ---
+    const textInput = document.getElementById('data-input');
+    const fileInput = document.getElementById('file-input');
+    const fileNameDisplay = document.getElementById('file-name-display');
+    const resultArea = document.getElementById('result-area');
+    const msgBox = document.getElementById('msg-box');
+    const previewImg = document.getElementById('preview-img');
+    const dataUrlOutput = document.getElementById('dataurl-output');
+    const downloadLink = document.getElementById('download-link');
+    
+    // --- Modal 相关变量 ---
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById("modal-image");
+
+    // --- 事件监听 ---
+
+    // 文件选择监听
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            fileNameDisplay.textContent = this.files[0].name;
+            processInput();
+        }
+    });
+
+    // **关键新增：点击预览图，打开 Modal**
+    previewImg.addEventListener('click', function() {
+        // 只有当图片有 src 时才打开
+        if(this.src && this.src !== window.location.href) {
+            modal.style.display = "flex"; // 使用 flex 布局居中
+            modalImg.src = this.src;
+        }
+    });
+
+    // 点击 Modal 背景关闭
+    modal.addEventListener('click', function(e) {
+        // 如果点击的是背景层（不是图片本身），则关闭
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+    
+    // 按 ESC 键关闭 Modal
+    document.addEventListener('keydown', function(e) {
+        if(e.key === "Escape" && modal.style.display === "flex") {
+             closeModal();
+        }
+    });
+
+    function closeModal() {
+        modal.style.display = "none";
+        modalImg.src = ""; // 清空资源
+    }
+
+    // --- 业务逻辑函数 ---
+
+    async function processInput() {
+        hideMsg();
+        if (fileInput.files && fileInput.files[0]) {
+            processFile(fileInput.files[0]);
+            return;
+        }
+        let rawStr = textInput.value.trim();
+        if (!rawStr) {
+            showMsg("请输入 DataURL、URL 链接或选择文件。", "error");
+            return;
+        }
+        let cleanStr = rawStr.replace(/^["']|["']$/g, '').trim();
+        if (cleanStr.match(/^https?:\/\//i)) {
+            processNetworkUrl(cleanStr);
+        } else {
+            processBase64(cleanStr);
+        }
+    }
+
+    function processFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => renderResult(e.target.result, "本地文件");
+        reader.onerror = () => showMsg("读取文件失败", "error");
+        reader.readAsDataURL(file);
+    }
+
+    function processBase64(str) {
+        if (!str.startsWith('data:')) str = detectAndFixHeader(str);
+        renderResult(str, "Base64 文本");
+    }
+
+    function processNetworkUrl(url) {
+        showMsg("正在尝试获取网络图片...", "warn");
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = function() {
+            hideMsg();
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = this.naturalWidth;
+                canvas.height = this.naturalHeight;
+                canvas.getContext('2d').drawImage(this, 0, 0);
+                renderResult(canvas.toDataURL('image/png'), "网络 URL (已转 Base64)");
+            } catch (e) {
+                renderResultOnlyDisplay(url, "网络 URL (CORS 受限)");
+                showMsg("注意：CORS 限制。无法生成 DataURL，仅供预览。", "warn");
+            }
+        };
+        img.onerror = () => showMsg("无法加载该 URL。", "error");
+        img.src = url;
+    }
+
+    function renderResult(dataUrl, sourceLabel) {
+        previewImg.src = dataUrl;
+        dataUrlOutput.value = dataUrl;
+        downloadLink.href = dataUrl;
+        downloadLink.download = `image_${new Date().getTime()}.png`;
+        downloadLink.textContent = "下载图片";
+        updateMetadata(dataUrl, sourceLabel);
+        resultArea.style.display = 'block';
+        setTimeout(() => resultArea.scrollIntoView({behavior: 'smooth'}), 100);
+    }
+
+    function renderResultOnlyDisplay(url, sourceLabel) {
+        previewImg.src = url;
+        dataUrlOutput.value = "无法获取 DataURL (受 CORS 策略保护)";
+        downloadLink.href = url;
+        downloadLink.target = "_blank";
+        downloadLink.textContent = "在新窗口打开原图";
+        document.getElementById('meta-source').textContent = sourceLabel;
+        document.getElementById('meta-type').textContent = "Remote Image";
+        document.getElementById('meta-size').textContent = "未知";
+        // 需要等图片加载完才能获取尺寸，这里简化处理，假设它已经加载
+        setTimeout(() => {
+             document.getElementById('meta-dims').textContent = `${previewImg.naturalWidth} x ${previewImg.naturalHeight} px`;
+        }, 100);
+        resultArea.style.display = 'block';
+    }
+
+    function updateMetadata(dataUrl, source) {
+        // 使用 setTimeout 确保 DOM 更新
+        setTimeout(() => {
+            document.getElementById('meta-dims').textContent = `${previewImg.naturalWidth} x ${previewImg.naturalHeight} px`;
+        }, 50);
+        let mime = "Unknown";
+        const match = dataUrl.match(/^data:(.*?);base64,/);
+        if (match) mime = match[1];
+        document.getElementById('meta-type').textContent = mime;
+        document.getElementById('meta-source').textContent = source;
+        document.getElementById('meta-size').textContent = calculateBase64Size(dataUrl);
+    }
+
+    function detectAndFixHeader(base64Str) {
+        const str = base64Str.trim();
+        if (str.startsWith('/9j/')) return 'data:image/jpeg;base64,' + str;
+        if (str.startsWith('iVBORw0KGgo')) return 'data:image/png;base64,' + str;
+        if (str.startsWith('R0lGOD')) return 'data:image/gif;base64,' + str;
+        if (str.startsWith('UklGR')) return 'data:image/webp;base64,' + str;
+        return 'data:image/png;base64,' + str;
+    }
+
+    function calculateBase64Size(dataUrl) {
+        if (!dataUrl.startsWith('data')) return "未知";
+        const content = dataUrl.split(',')[1] || "";
+        const sizeInBytes = (content.length * 0.75) - (content.match(/=/g) || []).length;
+        if (sizeInBytes < 1024) return sizeInBytes.toFixed(0) + ' B';
+        if (sizeInBytes < 1024*1024) return (sizeInBytes / 1024).toFixed(2) + ' KB';
+        return (sizeInBytes / (1024*1024)).toFixed(2) + ' MB';
+    }
+
+    function copyDataUrl() {
+        dataUrlOutput.select();
+        document.execCommand('copy');
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.textContent;
+        btn.textContent = "已复制！";
+        setTimeout(() => btn.textContent = originalText, 1500);
+    }
+
+    function showMsg(text, type) {
+        msgBox.textContent = text;
+        msgBox.className = 'msg-box ' + (type === 'error' ? 'msg-error' : 'msg-warn');
+        msgBox.style.display = 'block';
+    }
+
+    function hideMsg() { msgBox.style.display = 'none'; }
+
+    function clearAll() {
+        textInput.value = '';
+        fileInput.value = '';
+        fileNameDisplay.textContent = '';
+        resultArea.style.display = 'none';
+        previewImg.src = ""; // 清空图片缓存
+        hideMsg();
+    }
+</script>
+
+</body>
+</html>
