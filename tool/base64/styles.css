@@ -87,7 +87,16 @@ h1 {
 
 /* Vertical layout (top / bottom) */
 .editor.vertical {
-    grid-template-rows: 1fr auto 1fr;
+    grid-template-rows: auto auto auto;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 12px;
+    align-self: center;
+}
+
+.editor.vertical textarea {
+    height: 180px;
+    max-height: 240px;
 }
 
 /* Horizontal layout (left / right) */
