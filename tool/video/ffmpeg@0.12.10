@@ -1,2 +1,0 @@
-/* esm.sh - @ffmpeg/ffmpeg@0.12.10 */
-export * from "/@ffmpeg/ffmpeg@0.12.10/es2022/ffmpeg.mjs";

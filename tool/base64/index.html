@@ -3,21 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 Encoder/Decoder</title>
+    <title>Base64 Encoder / Decoder</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Base64 Encoder/Decoder</h1>
+    <h1>Base64 Encoder / Decoder</h1>
+
     <div class="container">
-        <textarea id="input"></textarea>
-        <div>
-            <button class="encode">Encode</button>
-            <button class="swap"><=></button>
-            <button class="clear">Clear</button>
-            <button class="decode">Decode</button>
+        <div class="toolbar">
+            <button id="layoutToggle">⇆ Switch Layout</button>
         </div>
-        <textarea id="output"></textarea>
+
+        <div class="editor vertical" id="editor">
+            <textarea id="input" placeholder="Input text…"></textarea>
+
+            <div class="buttons">
+                <button class="encode">Encode ⮕</button>
+                <button class="decode">⮜ Decode</button>
+                <button class="swap">⇄</button>
+                <button class="clear">Clear</button>
+            </div>
+
+            <textarea id="output" placeholder="Result…"></textarea>
+        </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
