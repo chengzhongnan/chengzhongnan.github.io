@@ -62,34 +62,106 @@ function base64DecodeBinary(base64) {
     return result;
 }
 
-encodeButton.addEventListener('click', () => {
-    outputTextArea.value = base64Encode(inputTextArea.value);
-});
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const editor = document.getElementById('editor');
+    
+    // 按钮
+    const btnEncode = document.getElementById('btnEncode');
+    const btnDecode = document.getElementById('btnDecode');
+    const btnSwap = document.getElementById('btnSwap');
+    const btnClear = document.getElementById('btnClear');
+    const layoutToggle = document.getElementById('layoutToggle');
 
-decodeButton.addEventListener('click', () => {
-   outputTextArea.value = base64Decode(inputTextArea.value);
-});
+    // ============================
+    // 核心功能 (支持 UTF-8 中文)
+    // ============================
+    
+    // Encode
+    btnEncode.addEventListener('click', () => {
+        if (!input.value.trim()) return;
+        output.value = base64Encode(input.value);
+    });
 
-swapButton.addEventListener('click', () => {
-    let tmpText = inputTextArea.value;
-    inputTextArea.value = outputTextArea.value;
-    outputTextArea.value = tmpText;
-})
+    // Decode
+    btnDecode.addEventListener('click', () => {
+        if (!input.value.trim()) return;
+        output.value = base64Decode(input.value);
+    });
 
-clearButton.addEventListener('click', () => {
-    inputTextArea.value = '';
-    outputTextArea.value = '';
-})
+    // Clear
+    btnClear.addEventListener('click', () => {
+        input.value = '';
+        output.value = '';
+        input.focus();
+    });
 
-const editor = document.getElementById('editor');
-const layoutToggle = document.getElementById('layoutToggle');
+    // Swap (交换输入输出)
+    btnSwap.addEventListener('click', () => {
+        const temp = input.value;
+        input.value = output.value;
+        output.value = temp;
+    });
 
-layoutToggle.addEventListener('click', () => {
-    editor.classList.toggle('horizontal');
-    editor.classList.toggle('vertical');
+    // ============================
+    // 布局切换
+    // ============================
+    layoutToggle.addEventListener('click', () => {
+        if (editor.classList.contains('horizontal')) {
+            editor.classList.remove('horizontal');
+            editor.classList.add('vertical');
+            // 更新箭头方向文字
+            btnEncode.innerHTML = 'Encode &darr;';
+            btnDecode.innerHTML = '&uarr; Decode';
+        } else {
+            editor.classList.remove('vertical');
+            editor.classList.add('horizontal');
+            // 更新箭头方向文字
+            btnEncode.innerHTML = 'Encode &rarr;';
+            btnDecode.innerHTML = '&larr; Decode';
+        }
+    });
 
-    layoutToggle.textContent =
-        editor.classList.contains('horizontal')
-            ? '⇅ Vertical Layout'
-            : '⇆ Horizontal Layout';
+    // ============================
+    //  高度同步逻辑 (Resize Sync)
+    // ============================
+    
+    // 使用 ResizeObserver 监听尺寸变化
+    let isResizing = false; //防止无限循环的锁
+
+    const syncHeight = (source, target) => {
+        // 如果当前正在由代码调整高度，则忽略本次触发
+        if (isResizing) return;
+
+        // 获取源元素的高度
+        const newHeight = source.offsetHeight;
+        
+        // 如果目标高度已经一样（允许1px误差），就不需要调整，避免抖动
+        if (Math.abs(target.offsetHeight - newHeight) < 2) return;
+
+        // 开启锁，防止目标元素改变时反过来触发源元素
+        isResizing = true;
+        
+        requestAnimationFrame(() => {
+            target.style.height = newHeight + 'px';
+            // 样式应用后，稍后释放锁
+            setTimeout(() => { isResizing = false; }, 0);
+        });
+    };
+
+    // 创建观察者
+    const ro = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            if (entry.target === input) {
+                syncHeight(input, output);
+            } else if (entry.target === output) {
+                syncHeight(output, input);
+            }
+        }
+    });
+
+    // 开始观察两个输入框
+    ro.observe(input);
+    ro.observe(output);
 });
