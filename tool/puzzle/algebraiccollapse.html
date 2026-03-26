@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7x10 代数坍缩证明 - 完美回放器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body class="p-8 flex justify-center items-start min-h-screen">
+
+    <div id="root" class="w-full max-w-5xl"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        const ROWS = 7;
+        const COLS = 10;
+
+        // 14 步终极解法 (明确定义了 rows 和 cols，消灭宽高混淆)
+        const SOLUTION_STEPS = [
+            { rows: 4, cols: 3, r: 0, c: 0, op: 1 },
+            { rows: 4, cols: 3, r: 0, c: 1, op: 1 },
+            { rows: 4, cols: 3, r: 0, c: 2, op: 1 },
+            { rows: 4, cols: 3, r: 0, c: 3, op: 1 },
+            { rows: 4, cols: 3, r: 0, c: 4, op: 1 },
+            { rows: 4, cols: 3, r: 0, c: 7, op: 1 },
+            { rows: 3, cols: 4, r: 4, c: 0, op: 1 },
+            { rows: 3, cols: 4, r: 4, c: 1, op: 1 },
+            { rows: 3, cols: 4, r: 4, c: 2, op: 1 },
+            { rows: 3, cols: 4, r: 4, c: 6, op: 1 },
+            { rows: 3, cols: 4, r: 0, c: 1, op: -1 },
+            { rows: 3, cols: 4, r: 0, c: 2, op: -1 },
+            { rows: 4, cols: 3, r: 3, c: 1, op: -1 },
+            { rows: 4, cols: 3, r: 3, c: 2, op: -1 }
+        ];
+
+        function App() {
+            const [step, setStep] = useState(0);
+            const [isPlaying, setIsPlaying] = useState(false);
+
+            // 自动播放逻辑
+            useEffect(() => {
+                let timer;
+                if (isPlaying && step < SOLUTION_STEPS.length) {
+                    timer = setTimeout(() => {
+                        setStep(s => s + 1);
+                    }, 600); // 600ms 播放速度
+                } else if (step >= SOLUTION_STEPS.length) {
+                    setIsPlaying(false);
+                }
+                return () => clearTimeout(timer);
+            }, [isPlaying, step]);
+
+            // 根据当前步数，计算网格权重
+            const grid = useMemo(() => {
+                let tempGrid = Array(ROWS).fill(0).map(() => Array(COLS).fill(0));
+                for (let i = 0; i < step; i++) {
+                    const { rows, cols, r, c, op } = SOLUTION_STEPS[i];
+                    for (let dr = 0; dr < rows; dr++) {
+                        for (let dc = 0; dc < cols; dc++) {
+                            tempGrid[r + dr][c + dc] += op;
+                        }
+                    }
+                }
+                return tempGrid;
+            }, [step]);
+
+            // 获取当前的辅助覆盖框 (强迫症补丁：第 14 步时强行返回 null，隐藏框框)
+            const currentTile = step > 0 && step < 14 ? SOLUTION_STEPS[step - 1] : null;
+
+            return (
+                <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+                    {/* 头部标题区 */}
+                    <div class="flex justify-between items-end border-b border-slate-100 pb-4 mb-6">
+                        <div>
+                            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Algebraic Collapse</h1>
+                            <p class="text-slate-500 mt-1">14-Step Exact Cover Diophantine Solution</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs font-bold text-slate-400 tracking-widest uppercase mb-1">Target Remainder</div>
+                        </div>
+                    </div>
+
+                    {/* 核心网格区 */}
+                    <div class="relative w-full aspect-[10/7] bg-slate-50 border border-slate-300 rounded overflow-hidden">
+                        {/* 7x10 基础网格 */}
+                        <div class="absolute inset-0 grid grid-cols-10 grid-rows-7 gap-0">
+                            {grid.map((row, r) => row.map((val, c) => {
+                                const isTarget = (r === 3 && c === 4) || (r === 3 && c === 5);
+                                const isSolved = isTarget ? val === 2 : val === 1;
+
+                                // 样式逻辑
+                                let bgClass = "bg-white";
+                                if (isTarget) bgClass = "bg-amber-100";
+
+                                let textClass = "text-slate-400";
+                                if (isSolved) textClass = "text-emerald-600 font-bold drop-shadow-sm";
+                                else if (val !== 0) textClass = "text-slate-800 font-medium";
+
+                                return (
+                                    <div key={`${r}-${c}`} class={`border border-slate-200 flex items-center justify-center relative transition-colors duration-300 ${bgClass}`}>
+                                        {/* 左上角小坐标 */}
+                                        <span class="absolute top-1 left-1 text-[10px] text-slate-300 font-mono"></span>
+                                        {/* 主数字 */}
+                                        <span class={`text-xl font-mono ${textClass}`}>
+                                            {val}
+                                            {isSolved && <span class="absolute top-1 right-1 text-emerald-500 text-xs"></span>}
+                                        </span>
+                                    </div>
+                                );
+                            }))}
+                        </div>
+
+                        {/* 当前步数的半透明覆盖框 (Overlay) */}
+                        {currentTile && (
+                            <div
+                                class={`absolute pointer-events-none transition-all duration-300 ease-in-out border-2 ${currentTile.op > 0 ? 'bg-emerald-400/20 border-emerald-500' : 'bg-rose-400/20 border-rose-500'}`}
+                                style={{
+                                    left: `${(currentTile.c / COLS) * 100}%`,
+                                    top: `${(currentTile.r / ROWS) * 100}%`,
+                                    width: `${(currentTile.cols / COLS) * 100}%`,
+                                    height: `${(currentTile.rows / ROWS) * 100}%`
+                                }}
+                            >
+                                <div class={`absolute inset-0 flex items-center justify-center text-4xl font-bold opacity-30 ${currentTile.op > 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                                    {currentTile.op > 0 ? '+1' : '-1'}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 状态日志 */}
+                    <div class="mt-4 h-8 flex items-center justify-center font-mono text-sm">
+                        {step === 0 ? (
+                            <span class="text-slate-500">Ready. Target: Make all cells 1, except X(3,4) and Y(3,5) to 2.</span>
+                        ) : step === 14 ? (
+                            <span class="text-emerald-600 font-bold text-lg animate-pulse">✨ Mathematical Proof Complete: Sum_other + 2X + 2Y = 0 ✨</span>
+                        ) : (
+                            <span class="text-slate-600">
+                                Step {step}/14: Placed <strong class={currentTile?.op > 0 ? 'text-emerald-600' : 'text-rose-600'}>{currentTile?.op > 0 ? '+1 (Add)' : '-1 (Sub)'}</strong> tile of size {currentTile?.rows}x{currentTile?.cols} at Row {currentTile?.r}, Col {currentTile?.c}.
+                            </span>
+                        )}
+                    </div>
+
+                    {/* 控制台 */}
+                    <div class="mt-6 flex justify-center gap-4">
+                        <button
+                            onClick={() => setIsPlaying(!isPlaying)}
+                            disabled={step === 14}
+                            class={`px-6 py-2 rounded-lg font-bold text-white shadow-sm transition-all ${step === 14 ? 'bg-slate-300 cursor-not-allowed' : isPlaying ? 'bg-amber-500 hover:bg-amber-600' : 'bg-blue-600 hover:bg-blue-700'}`}
+                        >
+                            {isPlaying ? '⏸ Pause' : '▶ Auto Play'}
+                        </button>
+
+                        <div class="flex bg-slate-100 rounded-lg p-1">
+                            <button
+                                onClick={() => { setStep(s => Math.max(0, s - 1)); setIsPlaying(false); }}
+                                disabled={step === 0}
+                                class="px-4 py-1 text-slate-600 hover:bg-white rounded font-medium disabled:opacity-50 transition-colors"
+                            >
+                                ◁ Prev
+                            </button>
+                            <button
+                                onClick={() => { setStep(s => Math.min(SOLUTION_STEPS.length, s + 1)); setIsPlaying(false); }}
+                                disabled={step === 14}
+                                class="px-4 py-1 text-slate-600 hover:bg-white rounded font-medium disabled:opacity-50 transition-colors"
+                            >
+                                Next ▷
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={() => { setStep(0); setIsPlaying(false); }}
+                            class="px-6 py-2 rounded-lg font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors"
+                        >
+                            ↺ Reset
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
