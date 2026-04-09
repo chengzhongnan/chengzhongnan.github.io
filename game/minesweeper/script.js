@@ -247,4 +247,26 @@ function addLongPressFlag(cell) {
   });
 }
 
+function startGame(rows, cols, mines) {
+    // 更新参数
+    rowCount = rows;
+    colCount = cols;
+    landmineCount = mines;
+
+    // 重置状态
+    isGameOver = false;
+    minesweeperBoard = [];
+    board.innerHTML = '';
+
+    // 高亮当前难度按钮
+    document.querySelectorAll('#level-btns button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    createBoard();
+}
+
+// 默认启动高级
+document.querySelector('#level-btns button:last-child').classList.add('active');
 createBoard();

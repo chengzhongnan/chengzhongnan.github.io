@@ -45,3 +45,29 @@
     border: 3px solid #666; /* Change to desired border style */
     /* Add any other styles for unopened cells */
 }
+
+#level-btns {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+#level-btns button {
+    padding: 8px 24px;
+    border: 2px solid #999;
+    border-radius: 6px;
+    background-color: #eee;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+#level-btns button:hover {
+    background-color: #ddd;
+}
+
+#level-btns button.active {
+    border-color: #555;
+    background-color: #bbb;
+    font-weight: bold;
+}
