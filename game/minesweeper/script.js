@@ -70,8 +70,10 @@ function createBoard() {
             cell.classList.add('cell', 'unopened');
             cell.dataset.row = i;
             cell.dataset.col = j;
+
             cell.addEventListener('click', handleClick);
             cell.addEventListener('contextmenu', handleRightClick);
+            addLongPressFlag(cell);
             
             board.appendChild(cell);
         }
@@ -209,6 +211,40 @@ function openAllCell() {
             openCell(i, j);
         }
     }
+}
+
+function addLongPressFlag(cell) {
+  let timer = null;
+  let moved = false;
+
+  cell.addEventListener('touchstart', (e) => {
+    moved = false;
+    timer = setTimeout(() => {
+      if (!moved) {
+        e.preventDefault();
+        // 模拟右键，复用已有逻辑
+        handleRightClick({
+          preventDefault: () => {},
+          target: cell
+        });
+        // 震动反馈（支持的设备）
+        if (navigator.vibrate) navigator.vibrate(50);
+      }
+    }, 500);
+  }, { passive: false });
+
+  cell.addEventListener('touchmove', () => {
+    moved = true;
+    clearTimeout(timer);
+  });
+
+  cell.addEventListener('touchend', () => {
+    clearTimeout(timer);
+  });
+
+  cell.addEventListener('touchcancel', () => {
+    clearTimeout(timer);
+  });
 }
 
 createBoard();
