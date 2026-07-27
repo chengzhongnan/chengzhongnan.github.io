@@ -60,7 +60,7 @@
 
         textarea.source-input:focus { outline: none; border-color: var(--primary-color); }
 
-        .file-upload-row { display: flex; align-items: center; gap: 15px; }
+        .file-upload-row { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
 
         .divider {
             display: flex; align-items: center; text-align: center; color: #999; font-size: 0.9em; margin: 5px 0;
@@ -77,8 +77,18 @@
         .btn-file { background-color: #17a2b8; color: white; position: relative; overflow: hidden; }
         .btn-file input[type=file] { position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%; font-size: 100px; text-align: right; filter: alpha(opacity=0); opacity: 0; outline: none; background: white; cursor: inherit; display: block; }
         .btn-file:hover { background-color: #138496; }
+        .btn-paste { background-color: #6f42c1; color: white; }
+        .btn-paste:hover { background-color: #5a32a3; }
         .btn-clear { background-color: var(--secondary-color); color: white; }
         .btn-clear:hover { background-color: #545b62; }
+
+        .container {
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .container.drag-over {
+            border: 2px dashed var(--primary-color) !important;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.25);
+        }
 
         /* 错误提示 */
         .msg-box { padding: 12px; border-radius: 6px; margin-bottom: 20px; display: none; font-size: 14px; line-height: 1.5; }
@@ -197,7 +207,7 @@
     <h2>全能图片解析工具</h2>
     
     <div class="input-section">
-        <textarea id="data-input" class="source-input" placeholder="粘贴 Data URL、Base64 字符串，或者以 http/https 开头的图片链接..."></textarea>
+        <textarea id="data-input" class="source-input" placeholder="粘贴 Data URL、Base64 字符串、图片链接，或直接在此处 Ctrl+V 粘贴剪贴板图片..."></textarea>
         
         <div class="divider">或者</div>
 
@@ -205,6 +215,9 @@
             <button class="btn-file">
                 📁 选择本地图片文件
                 <input type="file" id="file-input" accept="image/*">
+            </button>
+            <button class="btn-paste" onclick="pasteFromClipboard()">
+                📋 粘贴剪贴板图片
             </button>
             <span id="file-name-display" style="color:#666; font-size:14px;"></span>
         </div>
@@ -285,7 +298,73 @@
         }
     });
 
-    // **关键新增：点击预览图，打开 Modal**
+    // 全局粘贴事件监听 (支持 Ctrl+V 直接粘贴剪贴板图片)
+    document.addEventListener('paste', function(e) {
+        const clipboardData = e.clipboardData || window.clipboardData;
+        if (!clipboardData) return;
+
+        const items = clipboardData.items;
+        if (items) {
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type && items[i].type.startsWith('image/')) {
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        e.preventDefault();
+                        const fileName = file.name || "剪贴板图片.png";
+                        fileNameDisplay.textContent = fileName;
+                        fileInput.value = '';
+                        processFile(file, "剪贴板粘贴");
+                        return;
+                    }
+                }
+            }
+        }
+
+        // 如果未包含图片二进制数据，且焦点不在输入框时粘贴了文本，自动填充输入框并解析
+        if (document.activeElement !== textInput) {
+            const text = clipboardData.getData('text');
+            if (text && text.trim()) {
+                textInput.value = text.trim();
+                processInput();
+            }
+        }
+    });
+
+    // 拖拽文件上传支持
+    const mainContainer = document.querySelector('.container');
+    if (mainContainer) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            mainContainer.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                mainContainer.classList.add('drag-over');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            mainContainer.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                mainContainer.classList.remove('drag-over');
+            }, false);
+        });
+
+        mainContainer.addEventListener('drop', (e) => {
+            const files = e.dataTransfer && e.dataTransfer.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                if (file.type && file.type.startsWith('image/')) {
+                    fileNameDisplay.textContent = file.name;
+                    fileInput.value = '';
+                    processFile(file, "拖拽文件");
+                } else {
+                    showMsg("请拖拽有效的图片文件（PNG, JPG, GIF, WebP 等）。", "error");
+                }
+            }
+        });
+    }
+
+    // **点击预览图，打开 Modal**
     previewImg.addEventListener('click', function() {
         // 只有当图片有 src 时才打开
         if(this.src && this.src !== window.location.href) {
@@ -316,6 +395,39 @@
 
     // --- 业务逻辑函数 ---
 
+    async function pasteFromClipboard() {
+        hideMsg();
+        try {
+            if (navigator.clipboard && navigator.clipboard.read) {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const item of clipboardItems) {
+                    const imageType = item.types.find(t => t.startsWith('image/'));
+                    if (imageType) {
+                        const blob = await item.getType(imageType);
+                        const file = new File([blob], "clipboard_image.png", { type: imageType });
+                        fileNameDisplay.textContent = "剪贴板图片";
+                        fileInput.value = '';
+                        processFile(file, "剪贴板粘贴");
+                        return;
+                    }
+                }
+            }
+            
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                const text = await navigator.clipboard.readText();
+                if (text && text.trim()) {
+                    textInput.value = text.trim();
+                    processInput();
+                    return;
+                }
+            }
+            
+            showMsg("剪贴板中未发现图片数据，请直接在页面按 Ctrl+V 快捷键进行粘贴。", "warn");
+        } catch (err) {
+            showMsg("无法通过按钮直接读取剪贴板（通常因浏览器权限限制），请直接按下 Ctrl+V 快捷键粘贴图片！", "warn");
+        }
+    }
+
     async function processInput() {
         hideMsg();
         if (fileInput.files && fileInput.files[0]) {
@@ -324,7 +436,7 @@
         }
         let rawStr = textInput.value.trim();
         if (!rawStr) {
-            showMsg("请输入 DataURL、URL 链接或选择文件。", "error");
+            showMsg("请输入 DataURL、URL 链接或选择文件，或直接 Ctrl+V 粘贴图片。", "error");
             return;
         }
         let cleanStr = rawStr.replace(/^["']|["']$/g, '').trim();
@@ -335,9 +447,9 @@
         }
     }
 
-    function processFile(file) {
+    function processFile(file, sourceLabel = "本地文件") {
         const reader = new FileReader();
-        reader.onload = (e) => renderResult(e.target.result, "本地文件");
+        reader.onload = (e) => renderResult(e.target.result, sourceLabel);
         reader.onerror = () => showMsg("读取文件失败", "error");
         reader.readAsDataURL(file);
     }
